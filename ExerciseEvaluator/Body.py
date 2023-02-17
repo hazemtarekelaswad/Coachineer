@@ -17,6 +17,16 @@ class Body:
             parsed_joint = Joint()
             parsed_joint.parse(unparsed_joint)
             self.joints.append(parsed_joint)
+    
+    '''
+    joint1, joint2, joint3: indecies of the joints involved in the angle (found in Definitions.py)
+    returns:
+        float: angle in degrees
+    '''
+
+    # Todo
+    def calculate_angle(self, joint1, joint2, joint3) -> float:
+        pass
 
     def normalize(self):
         pass

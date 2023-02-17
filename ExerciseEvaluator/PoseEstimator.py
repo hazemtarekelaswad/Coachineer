@@ -6,7 +6,9 @@ from Imports import *
 class PoseEstimator:
     def __init__(self, video):
         self.video = video
+
     
+    ################### Private methods ###################
     '''
     pose_obj: is the pose object obtained from mediapipe
     frame_number: 0-based frame number
@@ -48,6 +50,7 @@ class PoseEstimator:
         return body
 
 
+    ################### Public methods ###################
     '''
     returns:
         BodySequence: BodySequence object with all the bodies in each frame inside

@@ -20,7 +20,12 @@ class BodySequence:
     def normalize(self):
         pass
 
-    def get_torso(self):
-        pass
+    '''
+    joint1, joint2, joint3: indecies of the joints involved in the angle (found in Definitions.py)
+    returns:
+        List[float]: angle in degrees in each frame
+    '''
+    def calculate_angles(self, joint1, joint2, joint3) -> List[float]:
+        return [body.calculate_angle(joint1, joint2, joint3) for body in self.bodies]
 
     

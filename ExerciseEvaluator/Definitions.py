@@ -39,3 +39,6 @@ class JointType(Enum):
     LEFT_FOOT_INDEX = mp.solutions.pose.PoseLandmark.LEFT_FOOT_INDEX.value
     RIGHT_FOOT_INDEX = mp.solutions.pose.PoseLandmark.RIGHT_FOOT_INDEX.value
 
+class Perspective(Enum):
+    LEFT = 0
+    RIGHT = 1

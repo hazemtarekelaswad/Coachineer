@@ -11,7 +11,7 @@ from Definitions import *
 
 
 def main():
-    video_reader = VideoReader('Data/V1.mp4')
+    video_reader = VideoReader('Data/V3.mp4')
 
     pose_estimator = PoseEstimator(video_reader.video)
     body_sequence = pose_estimator.estimate_sequence()
@@ -22,9 +22,9 @@ def main():
     exercise.evaluate()
     
     # print(body_sequence)
-    # file = open('shit', 'w')
-    # file.write(str(body_sequence))
-    # file.close()
+    file = open('shit', 'w')
+    file.write(str(body_sequence))
+    file.close()
 
 
 
