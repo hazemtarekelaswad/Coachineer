@@ -1,5 +1,6 @@
 from typing import List
 from Body import Body
+from Definitions import *
 
 class BodySequence:
     def __init__(self):
@@ -25,7 +26,7 @@ class BodySequence:
     returns:
         List[float]: angle in degrees in each frame
     '''
-    def calculate_angles(self, joint1, joint2, joint3) -> List[float]:
+    def calculate_angles(self, joint1: JointType, joint2: JointType, joint3: JointType) -> List[float]:
         return [body.calculate_angle(joint1, joint2, joint3) for body in self.bodies]
 
     

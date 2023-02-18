@@ -11,7 +11,7 @@ from Definitions import *
 
 
 def main():
-    video_reader = VideoReader('Data/V3.mp4')
+    video_reader = VideoReader('Data/V2.mp4')
 
     pose_estimator = PoseEstimator(video_reader.video)
     body_sequence = pose_estimator.estimate_sequence()
@@ -19,12 +19,19 @@ def main():
     exercise = ExerciseFactory.create_exercise(ExerciseType.BICEPS_CURLS, body_sequence)
 
     features = exercise.extract_features()
-    exercise.evaluate()
-    
-    # print(body_sequence)
-    file = open('shit', 'w')
-    file.write(str(body_sequence))
-    file.close()
+    evaluation = exercise.evaluate()
+
+    evaluation.to_csv('evaluation.csv')
+
+    # print(f'Reps: {exercise.reps}')
+
+    # file = open('features.txt', 'w')
+    # file.write(str(np.round(features)))
+    # file.close()
+
+    # file = open('joints.txt', 'w')
+    # file.write(str(body_sequence))
+    # file.close()
 
 
 

@@ -39,10 +39,12 @@ class PoseEstimator:
         
         ################# Drawing utility #################
         mp_drawing = mp.solutions.drawing_utils
-        mp_drawing.draw_landmarks(frame, 
-                                  keypoints.pose_landmarks, mp.solutions.pose.POSE_CONNECTIONS,
-                                  mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
-                                  mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2))
+        mp_drawing.draw_landmarks(
+            frame, 
+            keypoints.pose_landmarks, mp.solutions.pose.POSE_CONNECTIONS,
+            mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
+            mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
+        )
 
         cv2.imshow('Video', frame)
         ###################################################

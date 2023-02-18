@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from BodySequence import BodySequence
 from Imports import *
 
 class Exercise(ABC):
     def __init__(self, body_sequence: BodySequence):
         self.body_sequence: BodySequence = body_sequence
-        self.features: np.array = np.array([])
+        self.features: np.ndarray = np.array([])
+        self.reps: List[Tuple[int, int]] = []
 
 
     '''
@@ -16,9 +17,9 @@ class Exercise(ABC):
         It fills the "features" attribute.
     '''
     @abstractmethod
-    def extract_features(self) -> np.array:
+    def extract_features(self) -> np.ndarray:
         pass
 
     @abstractmethod
-    def evaluate(self):
+    def evaluate(self) -> pd.DataFrame:
         pass

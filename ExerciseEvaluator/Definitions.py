@@ -1,5 +1,7 @@
 from Imports import *
 
+
+
 class ExerciseType(Enum):
     BICEPS_CURLS = 0
 
