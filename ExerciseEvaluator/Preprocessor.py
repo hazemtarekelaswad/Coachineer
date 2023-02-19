@@ -1,4 +1,4 @@
-
+# TODO: Implement this class
 class Preprocessor:
     def __init__(self, video):
         self.video = video

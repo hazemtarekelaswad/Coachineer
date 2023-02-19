@@ -9,6 +9,13 @@ class Exercise(ABC):
         self.features: np.ndarray = np.array([])
         self.reps: List[Tuple[int, int]] = []
 
+    '''
+    fills "reps" with tuples, each tuple contains a range of
+    start_index(frame) and end_index(frame) of each rep
+    '''
+    @abstractmethod
+    def _fill_reps(self):
+        pass
 
     '''
     returns:

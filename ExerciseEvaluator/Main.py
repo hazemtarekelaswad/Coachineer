@@ -11,7 +11,7 @@ from Definitions import *
 
 
 def main():
-    video_reader = VideoReader('Data/V2.mp4')
+    video_reader = VideoReader('Data/V1.mp4')
 
     pose_estimator = PoseEstimator(video_reader.video)
     body_sequence = pose_estimator.estimate_sequence()
@@ -22,6 +22,9 @@ def main():
     evaluation = exercise.evaluate()
 
     evaluation.to_csv('evaluation.csv')
+    
+    # TODO: read csv file into a data frame and use it to output a visualization of the feedback
+
 
     # print(f'Reps: {exercise.reps}')
 
