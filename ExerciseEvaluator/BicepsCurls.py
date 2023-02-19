@@ -5,9 +5,9 @@ from Definitions import *
 from Exercise import Exercise
 
 ################### Constants ###################
-ERROR_1_ANGLE = 35
+ERROR_1_ANGLE = 20
 ERROR_2_ANGLE = 70
-REPS_THRESHOLD = 1
+REPS_THRESHOLD = 2
 
 
 class BicepsCurls(Exercise):

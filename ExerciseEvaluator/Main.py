@@ -5,25 +5,38 @@ from Body import Body
 from BodySequence import BodySequence
 from VideoReader import VideoReader
 from ExerciseFactory import ExerciseFactory
+from Visualizer import Visualizer
+from VisualizerFactory import VisualizerFactory 
 
 from Imports import *
 from Definitions import *
 
 
 def main():
-    video_reader = VideoReader('Data/V1.mp4')
+    # TODO: is to be read from a terminal command
+    video_path = 'Data/V4.mp4'
 
+    # Read the input video
+    video_reader = VideoReader(video_path)
+
+    # Perform pose estimation
     pose_estimator = PoseEstimator(video_reader.video)
     body_sequence = pose_estimator.estimate_sequence()
 
+    # Create new exercise
     exercise = ExerciseFactory.create_exercise(ExerciseType.BICEPS_CURLS, body_sequence)
 
+    # Extract features from estimated pose sequence
     features = exercise.extract_features()
-    evaluation = exercise.evaluate()
 
+    # Evaluate this exercise based on the features extracted
+    evaluation = exercise.evaluate()
     evaluation.to_csv('evaluation.csv')
-    
-    # TODO: read csv file into a data frame and use it to output a visualization of the feedback
+
+    # Visualizer the evaluation
+    video_reader = VideoReader(video_path)
+    visulaizer = VisualizerFactory.create_visualizer(ExerciseType.BICEPS_CURLS, video_reader.video, evaluation)
+    visulaizer.visualize()
 
 
     # print(f'Reps: {exercise.reps}')
