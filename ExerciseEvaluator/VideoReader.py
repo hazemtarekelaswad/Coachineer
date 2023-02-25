@@ -1,4 +1,4 @@
-from Imports import *
+from Common.Imports import *
 
 class VideoReader:
     def __init__(self, video_path):

@@ -1,5 +1,5 @@
-from Imports import *
-from Visualizer import Visualizer
+from Common.Imports import *
+from Visualizers.Visualizer import Visualizer
 
 class BicepsCurlsVisualizer(Visualizer):
 

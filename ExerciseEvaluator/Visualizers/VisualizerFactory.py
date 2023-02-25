@@ -1,6 +1,6 @@
-from Imports import *
-from Definitions import *
-from BicepsCurlsVisualizer import BicepsCurlsVisualizer
+from Common.Imports import *
+from Common.Definitions import *
+from Visualizers.BicepsCurlsVisualizer import BicepsCurlsVisualizer
 
 class VisualizerFactory:
 

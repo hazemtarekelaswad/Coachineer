@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Tuple
 from BodySequence import BodySequence
-from Imports import *
+from Common.Imports import *
 
 class Exercise(ABC):
     def __init__(self, body_sequence: BodySequence):

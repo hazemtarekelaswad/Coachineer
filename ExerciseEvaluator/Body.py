@@ -1,7 +1,7 @@
 from typing import List
 from Joint import Joint
-from Imports import *
-from Definitions import *
+from Common.Imports import *
+from Common.Definitions import *
 
 class Body:
     def __init__(self, frame_number: int):
@@ -10,8 +10,8 @@ class Body:
     
     def __str__(self):
         string = f'Frame: {self.frame_number}\n\n'
-        for joint in self.joints:
-            string += f'{joint}\n'
+        for index, joint in enumerate(self.joints):
+            string += f'{index}\n{joint}\n'
         return string
     
     def fill(self, unparsed_joints):

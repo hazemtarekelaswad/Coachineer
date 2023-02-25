@@ -1,5 +1,6 @@
-from Definitions import *
-from BicepsCurls import BicepsCurls
+from Common.Imports import *
+from Common.Definitions import *
+from Exercises.BicepsCurls import BicepsCurls
 from BodySequence import BodySequence
 
 class ExerciseFactory:

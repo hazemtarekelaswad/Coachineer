@@ -1,7 +1,8 @@
 from Body import Body
 from BodySequence import BodySequence
 
-from Imports import *
+from Common.Imports import *
+from Common.Definitions import *
 
 class PoseEstimator:
     def __init__(self, video):
@@ -41,10 +42,23 @@ class PoseEstimator:
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing.draw_landmarks(
             frame, 
-            keypoints.pose_landmarks, mp.solutions.pose.POSE_CONNECTIONS,
+            keypoints.pose_landmarks, 
+            mp.solutions.pose.POSE_CONNECTIONS,
             mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
             mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
         )
+
+        
+        # cv2.putText(
+        #     frame, 
+        #     'S', 
+        #     tuple(np.multiply([keypoints.pose_landmarks.landmark[JointType.RIGHT_ELBOW.value].x, keypoints.pose_landmarks.landmark[JointType.RIGHT_ELBOW.value].y], [self.video.get(3), self.video.get(4)]).astype(int)), 
+        #     cv2.FONT_HERSHEY_SIMPLEX, 
+        #     0.5, 
+        #     (255, 255, 255), 
+        #     2, 
+        #     cv2.LINE_AA
+        # )
 
         cv2.imshow('Video', frame)
         ###################################################

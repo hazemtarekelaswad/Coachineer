@@ -1,25 +1,42 @@
 from typing import Dict, List
 from BodySequence import BodySequence
-from Imports import *
-from Definitions import *
-from Exercise import Exercise
+from Common.Imports import *
+from Common.Definitions import *
+from Exercises.Exercise import Exercise
 
 ################### Constants ###################
-ERROR_1_ANGLE = 20
-ERROR_2_ANGLE = 70
-REPS_THRESHOLD = 2
+ERROR_1_ANGLE = 20 # The larger, the more flexible you can rotate shoulder angle
+ERROR_2_ANGLE = 70 # The larger, the more flexible the elbow angle is
+REPS_THRESHOLD = 4 # The larger, the more flexible detecting reps is
 
 
 class BicepsCurls(Exercise):
 ################### Private methods ###################
-    # TODO: detect perspective using z values
+    
     def _detect_perspective(self) -> Perspective:
+        left_count = 0
+
+        # The less the z value is, the more closer this point to the screen
+        for body in self.body_sequence.bodies:
+            if body.joints[JointType.LEFT_SHOULDER.value].z < body.joints[JointType.RIGHT_SHOULDER.value].z \
+            and body.joints[JointType.LEFT_ELBOW.value].z < body.joints[JointType.RIGHT_ELBOW.value].z \
+            and body.joints[JointType.LEFT_HIP.value].z < body.joints[JointType.RIGHT_HIP.value].z:
+                left_count += 1
+        
+        right_count = len(self.body_sequence.bodies) - left_count
+        # if left_count / len(self.body_sequence.bodies) > 0.5:
+        if left_count > right_count:
+            print('Left detected')
+            return Perspective.LEFT
+        print('Right detected')
         return Perspective.RIGHT
 
     # TODO: Modify this function
     #! This function assumes that the athlete starts from releasing the weight (max elbow angle)
-    #! and it ignores the last rep because the video finishes before lifting up the weight once again
-    #! So, we need a way to determine if he doesn't finish his rep or he finished it already at the end of the video
+    
+    # Iterate over elbow angles, if the angle starts decreasing then increasing, 
+    # then once decreased again, it will count 1 rep. the point of increasing or decreasing
+    # must be with difference greater than a threshold and must be of 2-step look-ahead
     def _fill_reps(self):
         is_increasing = False
         prev_is_increasing = False
@@ -27,23 +44,31 @@ class BicepsCurls(Exercise):
         start_index = 0
         end_index = 0
         
-        for index in range(len(self.features[:, 1]) - 1):
-            if self.features[index + 1, 1] - self.features[index, 1] > REPS_THRESHOLD:
+        for index in range(len(self.features[:, 1]) - 2):
+            if self.features[index + 1, 1] - self.features[index, 1] > REPS_THRESHOLD \
+            and self.features[index + 2, 1] - self.features[index, 1] > REPS_THRESHOLD:
                 is_increasing = True
-            elif self.features[index, 1] - self.features[index + 1, 1] > REPS_THRESHOLD:
+            elif self.features[index, 1] - self.features[index + 1, 1] > REPS_THRESHOLD \
+            and self.features[index, 1] - self.features[index + 2, 1] > REPS_THRESHOLD:
                 is_increasing = False
             
             # Changed?
             if is_increasing != prev_is_increasing: 
                 prev_is_increasing = is_increasing
                 turning_points += 1
-                        
+            
+            # Count a rep and reset
             if turning_points == 2:
                 end_index = index
                 self.reps.append((start_index, end_index))
                 start_index = index + 1
 
                 turning_points = 0
+        
+        # If you have already done half a rep or more, 
+        # then consider it as a complete rep (forearm is in its way down)
+        if turning_points == 1:
+            self.reps.append((start_index, len(self.features[:, 1]) - 1))
 
     '''
     Error 1: deals with shoulder angle

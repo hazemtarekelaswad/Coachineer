@@ -1,6 +1,6 @@
 from typing import List
 from Body import Body
-from Definitions import *
+from Common.Definitions import *
 
 class BodySequence:
     def __init__(self):

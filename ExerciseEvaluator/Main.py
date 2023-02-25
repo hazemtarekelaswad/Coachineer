@@ -4,12 +4,12 @@ from Joint import Joint
 from Body import Body
 from BodySequence import BodySequence
 from VideoReader import VideoReader
-from ExerciseFactory import ExerciseFactory
-from Visualizer import Visualizer
-from VisualizerFactory import VisualizerFactory 
+from Exercises.ExerciseFactory import ExerciseFactory
+from Visualizers.Visualizer import Visualizer
+from Visualizers.VisualizerFactory import VisualizerFactory 
 
-from Imports import *
-from Definitions import *
+from Common.Imports import *
+from Common.Definitions import *
 
 
 def main():
@@ -41,13 +41,13 @@ def main():
 
     # print(f'Reps: {exercise.reps}')
 
-    # file = open('features.txt', 'w')
+    # file = open('features.log', 'w')
     # file.write(str(np.round(features)))
     # file.close()
 
-    # file = open('joints.txt', 'w')
-    # file.write(str(body_sequence))
-    # file.close()
+    file = open('joints.log', 'w')
+    file.write(str(body_sequence))
+    file.close()
 
 
 
