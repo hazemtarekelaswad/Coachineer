@@ -14,7 +14,7 @@ from Common.Definitions import *
 
 def main():
     # TODO: is to be read from a terminal command
-    video_path = 'Data/V4.mp4'
+    video_path = 'Data/V10.mp4'
 
     # Read the input video
     video_reader = VideoReader(video_path)

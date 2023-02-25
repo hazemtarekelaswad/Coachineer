@@ -9,6 +9,9 @@ ERROR_1_ANGLE = 20 # The larger, the more flexible you can rotate shoulder angle
 ERROR_2_ANGLE = 70 # The larger, the more flexible the elbow angle is
 REPS_THRESHOLD = 4 # The larger, the more flexible detecting reps is
 
+REPS_UPPER_ANGLE = 130
+REPS_LOWER_ANGLE = 80
+
 
 class BicepsCurls(Exercise):
 ################### Private methods ###################
@@ -30,6 +33,7 @@ class BicepsCurls(Exercise):
             return Perspective.LEFT
         print('Right detected')
         return Perspective.RIGHT
+    
 
     # TODO: Modify this function
     #! This function assumes that the athlete starts from releasing the weight (max elbow angle)
@@ -65,6 +69,38 @@ class BicepsCurls(Exercise):
 
                 turning_points = 0
         
+        # If you have already done half a rep or more, 
+        # then consider it as a complete rep (forearm is in its way down)
+        if turning_points == 1:
+            self.reps.append((start_index, len(self.features[:, 1]) - 1))
+
+    
+    
+    def _fill_reps_2(self):
+        is_increasing = False
+        prev_is_increasing = False
+        turning_points = 0
+        start_index = 0
+        end_index = 0
+        for index in range(len(self.features[:, 1])):
+            if self.features[index, 1] < REPS_LOWER_ANGLE:
+                is_increasing = True
+            elif self.features[index, 1] > REPS_UPPER_ANGLE:
+                is_increasing = False
+            
+            # Changed?
+            if is_increasing != prev_is_increasing: 
+                prev_is_increasing = is_increasing
+                turning_points += 1
+            
+            # Count a rep and reset
+            if turning_points == 2:
+                end_index = index
+                self.reps.append((start_index, end_index))
+                start_index = index + 1
+
+                turning_points = 0
+
         # If you have already done half a rep or more, 
         # then consider it as a complete rep (forearm is in its way down)
         if turning_points == 1:
@@ -141,7 +177,7 @@ class BicepsCurls(Exercise):
             return None
 
         # Fill reps with its frames
-        self._fill_reps()
+        self._fill_reps_2()
         print(self.reps)
         # Evaluate shoulder joint
         shoulder_evaluation: List[bool] = self._evaluate_error_1()
