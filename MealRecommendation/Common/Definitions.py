@@ -21,6 +21,7 @@ class ActivityLevel(Enum):
     VERY_ACTIVE = 3,
     EXTRA_ACTIVE = 4
 
+# Can be one of them
 class DietType(Enum):
     ANYTHING = 0,
     KETO = 1,
@@ -29,7 +30,8 @@ class DietType(Enum):
     PALEO = 4,
     MEDITERRANEAN = 5
 
-class Allergies(Enum):
+# Can be more than one
+class Allergy(Enum):
     GLUTEN = 0,
     PEANUTS = 1,
     EGGS = 2,
