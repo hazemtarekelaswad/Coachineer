@@ -6,8 +6,55 @@ from app import app, db, bcrypt
 # from app.forms import 
 # from app.models import 
 
-# Add any needed routes here
-
+## Home Route
 @app.route('/')
 def home():
     pass
+
+## User Routes
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    pass
+
+@app.route('/signin', methods=['GET', 'POST'])
+def signin():
+    pass
+
+@app.route('/signout')
+def signout():
+    pass
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    pass
+
+## Meal Routes
+@app.route('/meals')
+def meals():
+    pass
+
+@app.route('/meals/<int:meal_id>', methods=['GET', 'POST'])
+def meal(meal_id):
+    pass
+
+@app.route('/recommended-meals')
+@login_required
+def recommended_meals():
+    pass
+
+@app.route('/recommended-meals/<int:meal_id>', methods=['GET', 'POST'])
+@login_required
+def recommended_meal(meal_id):
+    pass
+
+## Exercise Routes
+@app.route('/exercises')
+def exercises():
+    pass
+
+@app.route('/exercises/<int:exercise_id>', methods=['GET', 'POST'])
+def exercise(exercise_id):
+    pass
+
+
