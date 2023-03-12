@@ -2,14 +2,15 @@
 
 from flask import render_template, url_for, flash, redirect, request, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
-from app import app, db, bcrypt
+from app import app, db, bcrypt, utils
 # from app.forms import 
 # from app.models import 
+
 
 ## Home Route
 @app.route('/')
 def home():
-    pass
+    return render_template('index.html')
 
 ## User Routes
 @app.route('/signup', methods=['GET', 'POST'])
@@ -51,10 +52,10 @@ def recommended_meal(meal_id):
 ## Exercise Routes
 @app.route('/exercises')
 def exercises():
-    pass
+    return render_template('exercise_selection.html', exercises=utils.exercises)
 
 @app.route('/exercises/<int:exercise_id>', methods=['GET', 'POST'])
 def exercise(exercise_id):
-    pass
+    return render_template('exercise.html', exercise=utils.exercises[exercise_id])
 
 
