@@ -7,6 +7,7 @@ from app.config import Config
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = Config.SECRET_KEY
+app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
 app.config['SQLALCHEMY_DATABASE_URI'] = Config.SQLALCHEMY_DATABASE_URI
 
 db = SQLAlchemy(app)

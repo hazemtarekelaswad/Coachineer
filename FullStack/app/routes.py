@@ -1,11 +1,13 @@
 # Routes for the app
+import os
 import cv2
 from flask import render_template, url_for, flash, redirect, request, jsonify, Response
 from flask_login import login_user, current_user, logout_user, login_required
 from app import app, db, bcrypt, utils
-# from app.forms import 
+from app.forms import UploadVideoForm
+from app.config import Config
+from werkzeug.utils import secure_filename
 # from app.models import 
-
 
 ## Home Route
 @app.route('/')
@@ -56,8 +58,29 @@ def exercises():
 
 @app.route('/exercises/<int:exercise_id>', methods=['GET', 'POST'])
 def exercise(exercise_id):
-    return render_template('exercise.html', exercise=utils.exercises[exercise_id])
+    form = UploadVideoForm()
 
+    if form.validate_on_submit():
+        video = form.video.data
+        path = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'], secure_filename(video.filename))
+        video.save(path)
+        print("Uploaded successfully")
+        return "Uploaded successfully"
+    
+    return render_template('exercise_options.html', exercise=utils.exercises[exercise_id], form=form)
+
+
+@app.route('/exercises/<int:exercise_id>/upload', methods=['GET', 'POST'])
+def upload_video(exercise_id):
+    pass
+
+@app.route('/exercises/<int:exercise_id>/record', methods=['GET', 'POST'])
+def record_video(exercise_id):
+    pass
+
+@app.route('/exercises/<int:exercise_id>/realtime', methods=['GET', 'POST'])
+def realtime_video(exercise_id):
+    pass
 
 
 camera = cv2.VideoCapture(0)
