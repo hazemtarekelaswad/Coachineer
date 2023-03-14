@@ -2,21 +2,31 @@ exercises = [
     {
         "id": 0,
         "name": "Biceps Curls",
-        "image": "static/images/exercises/biceps_curls.jpg",
+        "image": "biceps_curls.jpg",
     },
     {
         "id": 1,
         "name": "Squats",
-        "image": "static/images/exercises/biceps_curls.jpg",
+        "image": "squats.jpg",
     },
     {
         "id": 2,
         "name": "Push Ups",
-        "image": "static/images/exercises/biceps_curls.jpg",
+        "image": "pushups.jpg",
     },
     {
         "id": 3,
-        "name": "Shoulder Press",
-        "image": "static/images/exercises/biceps_curls.jpg",
+        "name": "Lateral Raises",
+        "image": "biceps_curls.jpg",
+    },
+    {
+        "id": 4,
+        "name": "Pull ups",
+        "image": "biceps_curls.jpg",
+    },
+    {
+        "id": 5,
+        "name": "Triceps Extensions",
+        "image": "biceps_curls.jpg",
     }
 ]
