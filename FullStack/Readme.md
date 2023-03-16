@@ -1,5 +1,3 @@
-## ChatGPT answer
-
 ## Daily Calorie Needs *(Harris-Benedict equation)*
 
 ### BMR
@@ -15,6 +13,8 @@ Calculate your **BMR** using one of the following equations:
 
 ### Activity Level
 Determine your **activity level** using the following chart:
+
+*Calories based on BMR and activity level*
 
 - **Sedentary**: little or no exercise, desk job
 
@@ -47,24 +47,16 @@ If you have a specific goal, such as losing weight or gaining muscle, you'll nee
 
 **To gain muscle**: daily surplus of 250-500 calories.
 
-So, to factor in your goal, you'll need to adjust your daily calorie needs based on whether you want to lose weight or gain muscle. Here's how:
-
-- **To lose weight**: Subtract 500-1,000 calories from your daily calorie needs to create a calorie deficit. For example, if your daily calorie needs are 2,000 calories, you would need to consume 1,500-1,000 calories per day to lose weight at a safe and sustainable rate.
-
-- **To gain muscle**: Add 250-500 calories to your daily calorie needs to create a calorie surplus. For example, if your daily calorie needs are 2,000 calories, you would need to consume 2,250-2,500 calories per day to support muscle growth at a safe and sustainable rate.
-
-It's important to note that these are just estimates, and you may need to adjust your calorie intake based on your progress and individual needs. Additionally, it's important to focus on making sustainable lifestyle changes, such as eating a balanced diet and engaging in regular exercise, rather than relying on drastic calorie cuts or excessive calorie surpluses.
-
 
 ### BMI
-BMI = weight in kilograms / (height in meters)^2
+`BMI = weight(kg) / height(m) ^ 2`
 
 
 ### Body Fat
-Percentage of body fat using CUN-BAE method
+Percentage of body fat using **CUN-BAE** method
 
-CUN−BAE (BF%) = 
-    − 44.988
+`CUN−BAE (BF%) = 
+    −44.988
     + (0.503 * Age)
     + (10.689 * Sex) 
     + (3.172 * BMI) 
@@ -72,21 +64,28 @@ CUN−BAE (BF%) =
     + (0.181 * BMI * Sex) 
     − (0.02 * BMI * Age)
     − (0.005 * BMI^2 * Sex)
-    + (0.00021 * BMI^2 * Age)
+    + (0.00021 * BMI^2 * Age)`
 
-man = 0, woman = 1
+Sex:
+`man = 0`
+`woman = 1`
 
-BF%...
-For Women:  
-    ≤ 30% => Normal weight
-    30.1% – 35% => Overweight
-    > 35.1% => Obese
+$$ Men=   \left\{
+\begin{array}{ll}
+      Normal\ weight & BF \le 20\% \\
+      Overweight & 20.1\% \le BF \le 25\% \\
+      Obese & BF \gt 25.1\% \\
+\end{array} 
+\right.  $$
 
-For Men:
-    ≤ 20% => Normal weight
-    20.1% – 25% => overweight
-    > 25.1% => obese
-    
+$$ Women=   \left\{
+\begin{array}{ll}
+      Normal\ weight & BF \le 30\% \\
+      Overweight & 30.1\% \le BF \le 35\% \\
+      Obese & BF \gt 35.1\% \\
+\end{array} 
+\right.  $$
+
 
 
 
