@@ -1,6 +1,9 @@
+import ExerciseEvaluator
+
 exercises = [
     {
-        "id": 0,
+        "id": ExerciseEvaluator.ExerciseType.BICEPS_CURLS.value,
+        "type": ExerciseEvaluator.ExerciseType.BICEPS_CURLS,
         "name": "Biceps Curls",
         "image": "biceps_curls.jpg",
     },

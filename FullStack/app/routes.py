@@ -67,14 +67,34 @@ def recommended_meals():
 def recommended_meal(meal_id):
     pass
 
-# Exercise Routes
+######################### Exercise Routes #########################
 
-
+# GET: Display the exercise selection page
 @app.route('/exercises')
 def exercises():
     return render_template('exercise_selection.html', exercises=utils.exercises)
 
 
+# Utility function to evaluate the video
+def evaluate_video(video_name: str, exercise_id: int):
+    path = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        Config.UPLOAD_FOLDER,
+        secure_filename(video_name)
+    )
+
+    processed_video_path = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        Config.PROCESSED_FOLDER,
+        secure_filename(video_name)
+    )
+
+    evaluator = ExerciseEvaluator.Evaluator(path, processed_video_path, ExerciseEvaluator.ExerciseType(exercise_id))
+    evaluator.evaluate()
+
+
+# GET: Display the exercise options page based on the exercise id
+# POST: Upload the video, process it and redirect to the feedback page
 @app.route('/exercises/<int:exercise_id>', methods=['GET', 'POST'])
 def exercise(exercise_id):
     form = UploadVideoForm()
@@ -91,43 +111,22 @@ def exercise(exercise_id):
 
         # TODO: Display success message
 
-        # process the video
-        processed_video_path = os.path.join(
-            os.path.abspath(os.path.dirname(__file__)),
-            Config.PROCESSED_FOLDER,
-            secure_filename(video.filename)
-        )
-
-        evaluator = ExerciseEvaluator.Evaluator(path, processed_video_path)
-        evaluator.evaluate()
+        evaluate_video(video.filename, exercise_id)
 
         return render_template(
             'feedback.html',
             exercise=utils.exercises[exercise_id],
-            video_path=f'{Config.PROCESSED_FOLDER}/{secure_filename(video.filename)}'.removeprefix(
-                "static/")
+            video_path=f'{Config.PROCESSED_FOLDER}/{secure_filename(video.filename)}'.removeprefix("static/")
         )
 
     return render_template('exercise_options.html', exercise=utils.exercises[exercise_id], form=form)
 
 
+# GET: Evaluate the exercise and display the feedback page based on the exercise id
+## NOTE: This route is accessed directly from the record page
 @app.route('/exercises/<int:exercise_id>/evaluate')
 def evaluate(exercise_id):
-    path = os.path.join(
-        os.path.abspath(os.path.dirname(__file__)),
-        Config.UPLOAD_FOLDER,
-        secure_filename(Config.DEFAULT_VIDEO_NAME)
-    )
-
-    processed_video_path = os.path.join(
-        os.path.abspath(os.path.dirname(__file__)),
-        Config.PROCESSED_FOLDER,
-        secure_filename(Config.DEFAULT_VIDEO_NAME)
-    )
-
-    evaluator = ExerciseEvaluator.Evaluator(path, processed_video_path)
-    evaluator.evaluate()
-
+    evaluate_video(Config.DEFAULT_VIDEO_NAME, exercise_id)
     return render_template(
         'feedback.html',
         exercise=utils.exercises[exercise_id],
@@ -135,15 +134,15 @@ def evaluate(exercise_id):
     )
 
 
+# GET: Display the record page to record the video and evaluate it
 video_camera = None
 global_frame = None
-
 
 @app.route('/exercises/<int:exercise_id>/record')
 def record_video(exercise_id):
     return render_template('record.html', exercise=utils.exercises[exercise_id])
 
-
+# Utility routes for recording video (start, stop)
 @app.route('/record_status', methods=['POST'])
 def record_status():
     global video_camera
@@ -176,7 +175,7 @@ def video_stream():
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + global_frame + b'\r\n\r\n')
 
-
+# Utility route for streaming video
 @app.route('/video')
 def video():
     return Response(video_stream(), mimetype='multipart/x-mixed-replace; boundary=frame')
