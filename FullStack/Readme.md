@@ -47,10 +47,12 @@ If you have a specific goal, such as losing weight or gaining muscle, you'll nee
 
 **To gain muscle**: daily surplus of 250-500 calories.
 
+---
 
 ### BMI
 `BMI = weight(kg) / height(m) ^ 2`
 
+---
 
 ### Body Fat
 Percentage of body fat using **CUN-BAE** method

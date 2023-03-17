@@ -1,5 +1,6 @@
 from Common.Definitions import *
 from Common.Imports import *
+from Health import Health
 
 
 class User:
@@ -13,9 +14,8 @@ class User:
 
         gender: Gender,
         age: int,
-        weight: float,
-        height: float,
-        body_fat: BodyFat,
+        weight: float, # in kg
+        height: float, # in cm
         goal: Goal,
         activity_level: ActivityLevel,
         diet_type: DietType,
@@ -29,30 +29,34 @@ class User:
 
         self.gender = gender
         self.age = age
-        self.weight = weight
-        self.height = height
-        self.body_fat = body_fat
+        self.weight = weight # in kg
+        self.height = height # in cm
         self.goal = goal
         self.activity_level = activity_level
+
+        #!
         self.diet_type = diet_type
         self.allergies = allergies
-        # self.bmi = None # BMI is calculated based on weight and height
-
-    #! can be changed, not sure of it
-    def _calculate_bmi(self) -> float:
-        self.bmi = self.weight / ((self.height / 100) ** 2)
-
-    def _calculate_calories(self) -> float:
-        pass
-
-    def _calculate_protein(self) -> float:
-        pass
+        
+    def get_bmi(self) -> float:
+        return Health.calculate_bmi(self.weight, self.height)
     
-    def _calculate_carbs(self) -> float:
-        pass
-
-    def _calculate_fat(self) -> float:
-        pass
+    def get_daily_calories(self) -> float:
+        return Health.calculate_daily_calories(
+            bmr = Health.calculate_bmr(self.weight, self.height, self.age, self.gender),
+            activity_level = self.activity_level,
+            goal = self.goal
+        )
+    
+    def get_body_fat(self) -> Tuple[float, BodyFat]:
+        return Health.calculate_body_fat(
+            self.age, 
+            self.gender, 
+            Health.calculate_bmi(self.weight, self.height)
+        )
+    
+    def get_macros(self) -> Tuple[float, float, float]:
+        return Health.calculate_macro_calories(self.get_daily_calories())
 
     ########################################
 
