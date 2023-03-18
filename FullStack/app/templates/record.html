@@ -9,10 +9,6 @@ Record {{ exercise.name }}
 
 {% block content %}
 
-<!-- Nav bar -->
-<div class="p-5 bg-dark"></div>
-<!-- -------- -->
-
 <div class="container my-4">
     <h1>{{ exercise.name }}</h1>
     <p>You can start recording video of you doing {{ exercise.name }}</p>
@@ -28,6 +24,8 @@ Record {{ exercise.name }}
     </div>
 </div>
 
+<!-- Script to handle record buttons -->
+<script type="text/javascript" src="{{ url_for('static', filename='js/recorder.js') }}"></script>
 <!-- Footer -->
 <div class="p-5 bg-dark"></div>
 
