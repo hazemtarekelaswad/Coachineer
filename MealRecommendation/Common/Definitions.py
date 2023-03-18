@@ -1,19 +1,26 @@
 from enum import Enum
 
+# NOT NULL
+# SIGN UP
 class Gender(Enum):
     MALE = 0,
     FEMALE = 1
 
+# NOT NULL
 class BodyFat(Enum):
     LOW = 0,
     MEDIUM = 1,
     HIGH = 2
 
+# NOT NULL
+# SIGN UP
 class Goal(Enum):
     LOSE_WEIGHT = 0,
     MAINTAIN_WEIGHT = 1,
     BUILD_MUSCLE = 2
 
+# NOT NULL
+# SIGN UP
 class ActivityLevel(Enum):
     SEDENTARY = 0,
     LIGHTLY_ACTIVE = 1,
@@ -21,6 +28,8 @@ class ActivityLevel(Enum):
     VERY_ACTIVE = 3,
     EXTRA_ACTIVE = 4
 
+# NOT NULL
+# SIGN UP
 # Can be one of them
 class DietType(Enum):
     ANYTHING = 0,
@@ -29,6 +38,9 @@ class DietType(Enum):
     VEGAN = 3,
     PALEO = 4,
     MEDITERRANEAN = 5
+
+# NULLABLE
+# SIGN UP
 
 # Can be more than one
 class Allergy(Enum):
