@@ -49,6 +49,10 @@ class VideoCamera(object):
     def __del__(self):
         self.cap.release()
     
+    # For readability purposes
+    def release(self):
+        self.cap.release()
+    
     def get_frame(self):
         ret, frame = self.cap.read()
         frame = cv2.flip(frame, 1)

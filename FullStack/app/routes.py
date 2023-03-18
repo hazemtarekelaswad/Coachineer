@@ -69,6 +69,40 @@ def recommended_meal(meal_id):
 
 ######################### Exercise Routes #########################
 
+# Global variables for video recording
+video_camera = None
+global_frame = None
+
+# Prevent caching for every request.
+# used to avoid issues related to releasing video camera
+@app.after_request
+def prevent_caching(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+# Defined decorator to exclude a function from the before_request hook
+def exclude(func):
+    func._exclude = True
+    return func
+
+# Utility function to release the camera resources before each request
+@app.before_request
+def release_camera(*args, **kwargs):
+    is_excluded = False
+
+    if request.endpoint in app.view_functions:
+        view_func = app.view_functions[request.endpoint]
+        is_excluded = hasattr(view_func, '_exclude')
+    
+    if is_excluded: return
+
+    global video_camera
+    if video_camera:
+        video_camera.release()
+        video_camera = None
+
 # GET: Display the exercise selection page
 @app.route('/exercises')
 def exercises():
@@ -135,17 +169,18 @@ def evaluate(exercise_id):
 
 
 # GET: Display the record page to record the video and evaluate it
-video_camera = None
-global_frame = None
 
 @app.route('/exercises/<int:exercise_id>/record')
+@exclude
 def record_video(exercise_id):
     return render_template('record.html', exercise=utils.exercises[exercise_id])
 
 # Utility routes for recording video (start, stop)
 @app.route('/record_status', methods=['POST'])
+@exclude
 def record_status():
     global video_camera
+
     if video_camera == None:
         video_camera = VideoCamera()
 
@@ -177,10 +212,11 @@ def video_stream():
 
 # Utility route for streaming video
 @app.route('/video')
+@exclude
 def video():
     return Response(video_stream(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-
+# GET: Display the streaming page and evaluate the stream in real time while recording
 @app.route('/exercises/<int:exercise_id>/realtime', methods=['GET', 'POST'])
 def realtime_video(exercise_id):
     pass
