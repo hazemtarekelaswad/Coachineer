@@ -8,3 +8,10 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 
 class UploadVideoForm(FlaskForm):
     video = FileField("video", validators=[InputRequired()])
+    
+    
+class loginForm(FlaskForm):
+    
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')

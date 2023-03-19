@@ -5,7 +5,8 @@ import cv2
 from flask import render_template, url_for, flash, redirect, request, jsonify, Response
 from flask_login import login_user, current_user, logout_user, login_required
 from app import app, db, bcrypt, utils
-from app.forms import UploadVideoForm
+from app.forms import UploadVideoForm, loginForm
+from app.models import User
 from app.config import Config
 from werkzeug.utils import secure_filename
 from app.camera import VideoCamera
@@ -30,12 +31,24 @@ def signup():
 
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
-    return render_template('./auth/login.html')
+    form = loginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.password == form.password.data:
+            login_user(user)
+            print('User logged in!')
+            flash('You have been logged in!', 'success')
+            return redirect(url_for('exercises'))
+        else:
+            flash('Login Unsuccessful. Please check email and password', 'danger')
+    return render_template('./auth/login.html', form=form)
 
 
 @app.route('/signout')
 def signout():
-    pass
+    logout_user()
+    flash('You have been logged out!', 'success')
+    return redirect(url_for('exercises'))
 
 
 @app.route('/profile', methods=['GET', 'POST'])

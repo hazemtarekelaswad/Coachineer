@@ -13,7 +13,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = Config.SQLALCHEMY_DATABASE_URI
 db = SQLAlchemy(app)
 app.app_context().push()
 bcrypt = Bcrypt(app)
-# login_manager = LoginManager(app)
+login_manager = LoginManager(app)
 # Redirects to login page if user is not logged in
 # for all routes that require login with @login_required decorator
 # login_manager.login_view = 'login' # Name of the function that handles login
