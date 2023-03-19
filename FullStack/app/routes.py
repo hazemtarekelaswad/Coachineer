@@ -30,7 +30,7 @@ def signup():
 
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
-    pass
+    return render_template('./auth/login.html')
 
 
 @app.route('/signout')

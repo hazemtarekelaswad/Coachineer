@@ -11,6 +11,7 @@ app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
 app.config['SQLALCHEMY_DATABASE_URI'] = Config.SQLALCHEMY_DATABASE_URI
 
 db = SQLAlchemy(app)
+app.app_context().push()
 bcrypt = Bcrypt(app)
 # login_manager = LoginManager(app)
 # Redirects to login page if user is not logged in
