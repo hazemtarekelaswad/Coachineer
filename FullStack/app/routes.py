@@ -26,7 +26,7 @@ def home():
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    pass
+    return render_template('./auth/signup.html')
 
 
 @app.route('/signin', methods=['GET', 'POST'])
