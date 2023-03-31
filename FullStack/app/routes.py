@@ -260,3 +260,12 @@ def realtime_video(exercise_id):
 #             secure_filename(video.filename)
 #         )
 #     return Response(generate_frames(path), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/exercises/<int:exercise_id>/postprocess')
+def post_process(exercise_id):
+    path = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        Config.ANALYSIS_FOLDER
+    )
+    ExerciseEvaluator.PostProcessor.run(path)
+    return 'test post processing'
