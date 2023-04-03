@@ -1,0 +1,91 @@
+{% extends 'master.html' %}
+{% block title %}{{ "analysis" }}{% endblock title %}
+
+{% block headings %}
+{% endblock headings %}
+
+
+
+{% block content %}
+<div class="container my-4">
+    <h1>Analysis </h1>
+</div>
+
+<div class="container my-4">
+    <div class="accordion accordion-flush" id="accordionFlushExample">
+        {% for graph in graphs %}
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#{{graph}}" aria-expanded="false" aria-controls="flush-collapseOne">
+                    {{ graph.replace('_', ' ').title() }}
+                </button>
+            </h2>
+            <div id="{{graph}}" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                <div class="accordion-body">
+                    <div class="d-flex flex-row justify-content-evenly">
+                        <img width="600px" height="600px"
+                            src="{{ url_for('static', filename = 'images/graphs/' + graph + '.png') }}">
+                        <div class="card my-5">
+                            {% if feedback[loop.index0].feedback%}
+                                <div class="card-header bg-success text-white" style="--bs-bg-opacity: .75;">No Injuiry risk</div>
+                            {% else %}
+                                <div class="card-header bg-danger text-white" style="--bs-bg-opacity: .75;">Injuiry risk</div>
+                            {% endif %}
+
+                            <div class="card-body">
+
+                                <h5 class="card-title">{{ graph.replace('_', ' ').title() }}</h5>
+                                <p class="card-text">
+                                    {% if feedback[loop.index0].feedback%}
+                                    ✅ You are doing great <hr> From the graph we can see that you don't have any injury risk and you are trying to maintain a proper technique.
+                                    {% else %}
+                                    ❌ Warning: Potential injuiry <hr> From the graph we can see that you have an injury risk and you are not trying to maintain a proper technique. Please visit a orthopedist for any potential injuries.
+                                    {% endif %}
+                                </p>
+                                <button class="btn btn-link btn-sm fst-italic text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#see-more" aria-expanded="false" aria-controls="collapseExample">
+                                    See more details
+                                </button>
+                                <div class="collapse" id="see-more">
+                                    <table class="table">
+                                        <thead>
+                                          <tr>
+                                            <th scope="col">Property</th>
+                                            <th scope="col">Value</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          <tr>
+                                            <td>x-axis</td>
+                                            <td>Rep</td>
+                                          </tr>
+                                          <tr>
+                                            <td>y-axis</td>
+                                            <td>Cumulative mistakes</td>
+                                          </tr>
+                                          <tr>
+                                            <td>Number of reps</td>
+                                            <td>{{feedback[loop.index0].reps}}</td>
+                                          </tr>
+                                          <tr>
+                                            <td>Line slope</td>
+                                            <td>{{feedback[loop.index0].slope}}</td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% for graph in graphs %}
+<div class="text-center">
+</div>
+{% endfor %}
+{% endblock content %}

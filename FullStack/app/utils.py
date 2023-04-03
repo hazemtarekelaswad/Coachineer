@@ -33,3 +33,6 @@ exercises = [
         "image": "biceps_curls.jpg",
     }
 ]
+
+
+joints = [jointType.name.lower() for jointType in ExerciseEvaluator.JointType]

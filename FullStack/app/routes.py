@@ -261,11 +261,31 @@ def realtime_video(exercise_id):
 #         )
 #     return Response(generate_frames(path), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/exercises/<int:exercise_id>/postprocess')
-def post_process(exercise_id):
+#! should be called after the video evaluation is done
+@app.route('/postprocessing')
+def postprocess():
     path = os.path.join(
         os.path.abspath(os.path.dirname(__file__)),
         Config.ANALYSIS_FOLDER
     )
-    ExerciseEvaluator.PostProcessor.run(path)
-    return 'test post processing'
+    graphs_path = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        Config.GRAPHS_FOLDER
+    )
+    ExerciseEvaluator.PostProcessor.run_with_merge(path, graphs_path)
+    return redirect(url_for('analyze_evaluated_exercise'))
+
+
+@app.route('/analysis')
+def analyze_evaluated_exercise():
+    path = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        Config.ANALYSIS_FOLDER
+    )
+    graphs_path = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        Config.GRAPHS_FOLDER
+    )
+    feedback = ExerciseEvaluator.PostProcessor.run_without_merge(path, graphs_path)
+    if feedback is None: return render_template('empty_analysis.html')
+    return render_template('analysis.html', graphs=utils.joints, feedback=feedback)

@@ -1,0 +1,18 @@
+{% extends 'master.html' %}
+{% block title %}{{ "Empty analysis" }}{% endblock title %}
+
+{% block headings %}
+{% endblock headings %}
+
+
+
+{% block content %}
+    <div class="container my-4">
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">No Available Analysis </h4>
+            <p>You haven't done any exercise till the moment. So, there is no available analysis.</p>
+            <a href="/exercises" class="btn btn-dark"> Start Working Out </a>
+        </div>
+    </div>
+
+{% endblock content %}

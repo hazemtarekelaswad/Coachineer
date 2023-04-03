@@ -7,4 +7,5 @@ class Config:
     UPLOAD_FOLDER = 'static/videos/original'
     PROCESSED_FOLDER = 'static/videos/processed'
     ANALYSIS_FOLDER = 'static/analysis'
+    GRAPHS_FOLDER = 'static/images/graphs'
     DEFAULT_VIDEO_NAME = 'video.mp4'
