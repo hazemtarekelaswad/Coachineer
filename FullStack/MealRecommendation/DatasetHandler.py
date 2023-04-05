@@ -1,12 +1,13 @@
 from Common.Imports import *
 from Common.Definitions import *
+from typing import Dict
 
 #* Meal is a pandas Series, not a class
 #* all meals are in a dataframe produced from the dataset
 
 class DatasetHandler:
-    def __init__(self, dataset: pd.DataFrame):
-        self.dataset = dataset
+    def __init__(self, datasets: Dict[Dataset, pd.DataFrame]):
+        self.datasets = datasets
     
     # The unique ingredients are considered as the features
     def get_unique_ingredients(self) -> List[str]:

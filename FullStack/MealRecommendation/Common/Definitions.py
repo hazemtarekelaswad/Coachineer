@@ -54,3 +54,12 @@ class Allergy(Enum):
     DAIRY = 7
 
 
+class Dataset(Enum):
+    INGREDIENTS = 0,
+    INTERACTIONS = 1,
+    MEALS = 2,
+    USERS = 3,
+    RAW_MEALS = 4,
+    RAW_INTERACTIONS = 5,
+
+
