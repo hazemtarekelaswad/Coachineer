@@ -20,7 +20,7 @@ class PostProcessor:
         is_file_empty = os.path.isfile(path) and os.path.getsize(path) <= 0
         if is_file_empty: return None
         return pd.read_csv(path)
-
+    
     def read_json_file(self, path) -> pd.Series:
         self.metadata = pd.read_json(path, typ='series')
         return self.metadata
@@ -49,8 +49,8 @@ class PostProcessor:
         # add the rep column
         converted_evaluation['rep'] = evaluation['rep']
 
-        # fill the rest of the columns with 0
-        converted_evaluation.replace(np.nan, 0, inplace=True)
+        # fill the rest of the columns with -1
+        converted_evaluation.replace(np.nan, -1, inplace=True)
 
         # Reformat the data
         exercise = ExerciseType[self.metadata['exercise']]
@@ -73,26 +73,34 @@ class PostProcessor:
         #     Perspective[self.metadata['perspective']]
         # )
 
-        all_involved_joints = [jointType for jointType in JointType]
+        all_joints = [jointType for jointType in JointType]
 
         joint_info_list = []
-        for joint in all_involved_joints:
+        for joint in all_joints:
             joint_info = {}
-            
-            name = joint.name.lower()
-            x_axis = converted_evaluation['rep']
-            y_axis = converted_evaluation[name].cumsum()
-            weights = np.polyfit(x_axis, y_axis, 1)
-            line = np.poly1d(weights)
-            slope = weights[0]
 
+            name = joint.name.lower()
+            converted_evaluation_dropped = converted_evaluation[converted_evaluation[name] != -1]
+            y_axis = converted_evaluation_dropped[name].cumsum()
+            x_axis = pd.Series(list(range(y_axis.shape[0])))
+
+            if y_axis.empty:
+                weights = 'No weights available'
+                line = 'No line available'
+                slope = 0
+            else:
+                weights = np.polyfit(x_axis, y_axis, 1)
+                line = np.poly1d(weights)
+                slope = weights[0]
+
+            joint_info['available'] = not y_axis.empty
             joint_info['name'] = name
             joint_info['x_axis'] = x_axis
             joint_info['y_axis'] = y_axis
             joint_info['weights'] = weights
             joint_info['line'] = line
             joint_info['slope'] = slope
-            joint_info['reps'] = len(x_axis)
+            joint_info['reps'] = x_axis.shape[0]
 
             joint_info_list.append(joint_info)
 
@@ -129,12 +137,27 @@ class PostProcessor:
 
             # plt.subplot(len(analyzed_data), 1, index + 1)  # rows, columns, index
 
-            plt.plot(joint['x_axis'], joint['y_axis'], 'o')
-            plt.plot(joint['x_axis'], joint['line'](joint['x_axis']), "r--")
+            if joint['available']:
+                plt.plot(joint['x_axis'], joint['y_axis'], 'o')
+                plt.plot(joint['x_axis'], joint['line'](joint['x_axis']), "r--")
 
-            plt.title(joint['name'])
-            plt.xlabel('Reps')
-            plt.ylabel('Cumulative mistakes')
+                plt.title(joint['name'])
+                plt.xlabel('Reps')
+                plt.ylabel('Cumulative mistakes')
+            
+            else:
+                plt.title(joint['name'])
+                plt.xlabel('Reps')
+                plt.ylabel('Cumulative mistakes')
+                plt.text(
+                    0.5, 
+                    0.5, 
+                    'No data available', 
+                    horizontalalignment='center', 
+                    verticalalignment='center', 
+                    transform=plt.gca().transAxes, 
+                    fontdict={'fontsize': 20}
+                )
         
             if graphs_path:
                 plt.savefig(os.path.join(graphs_path, f'{joint["name"]}.png'))
@@ -142,8 +165,7 @@ class PostProcessor:
                 plt.show()
     
     
-
-    #? The only method you need to call
+    #? The only method you need to call for post processing
     @staticmethod
     def run_with_merge(directory_path: str, graphs_path: str) -> List[Dict[str, Any]]:
         post_processor = PostProcessor()
@@ -164,9 +186,12 @@ class PostProcessor:
 
         # TODO: Get stored evaluation from database not a file
         stored_evaluation = post_processor.read_csv_file(evaluation_db_path)
+        print (stored_evaluation)
+        print(converted_evaluation)
 
         # Merge stored evaluation with converted_evaluation
         merged_evaluation = post_processor.merge(stored_evaluation, converted_evaluation)
+        print(merged_evaluation)
 
         # TODO: Save converted_evaluation to database not a file
         merged_evaluation.to_csv(evaluation_db_path, index=False)
@@ -175,7 +200,7 @@ class PostProcessor:
         post_processor.visualize(analyzed_data, graphs_path=graphs_path)
         return post_processor.get_all_joints_feedback(analyzed_data)
     
-    #? The only method you need to call
+    #? The only method you need to call for analysis page
     @staticmethod
     def run_without_merge(directory_path: str, graphs_path: str) -> Optional[List[Dict[str, Any]]]:
         post_processor = PostProcessor()
