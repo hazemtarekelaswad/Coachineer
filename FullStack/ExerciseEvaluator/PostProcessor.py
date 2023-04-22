@@ -13,34 +13,48 @@ SLOPE_THRESHOLD = 0.5
 
 class PostProcessor:
 
+    # initialize the metadata object that contain information about the exercise
     def __init__(self):
         self.metadata = None
 
+    # read the csv file and 
+    #   return:  - a data frame
+    #            - None if the file is empty 
     def read_csv_file(self, path) -> Optional[pd.DataFrame]:
         is_file_empty = os.path.isfile(path) and os.path.getsize(path) <= 0
         if is_file_empty: return None
         return pd.read_csv(path)
     
+    # read the json file and set the metadata object
     def read_json_file(self, path) -> pd.Series:
         self.metadata = pd.read_json(path, typ='series')
         return self.metadata
 
+    # get the affected joints based on the exerciese, perspective, and the error type
+    # return: a list of the affected joints
     def get_involved_joints(self, exercise: ExerciseType, perspective: Perspective, error: int) -> List[JointType]:
         return involved_joints[exercise][f'error_{error}'][perspective]
 
+    # get all the affected joints across all error types based on the exercise and perspective
+    # return: a list where each row represents the error type and the columns represent the affected joints for each error type
     def get_all_involved_joints(self, exercise: ExerciseType, perspective: Perspective) -> List[List[JointType]]:
         errors_count = len(involved_joints[exercise])
         return [self.get_involved_joints(exercise, perspective, i + 1) for i in range(errors_count)]
     
+    # flatten the joints across all error types
+    # return: a list of all the affected joints
     def get_all_involved_joints_flattened(self, exercise: ExerciseType, perspective: Perspective) -> List[JointType]:
         return [joint for joints in self.get_all_involved_joints(exercise, perspective) for joint in joints]
 
+    # merge the stored evaluation in the evaluation.db with the converted evaluation (current evaluation) by appending them together
     def merge(self, stored_evaluation: pd.DataFrame, converted_evaluation: pd.DataFrame) -> pd.DataFrame:
         if stored_evaluation is None:
             return converted_evaluation
         converted_evaluation['rep'] += stored_evaluation['rep'].iloc[-1] + 1
         return pd.concat([stored_evaluation, converted_evaluation], ignore_index=True)
 
+    # Convert structure of evaluation.csv comes from Evaluator to another structure where
+    # each row represents a rep and each column represents a joint type
     def convert_structure(self, evaluation) -> pd.DataFrame:
         # data frame with columns of joint names
         converted_evaluation = pd.DataFrame(
@@ -66,6 +80,18 @@ class PostProcessor:
 
         return converted_evaluation
     
+    # get cumulative sum of all reps on all joints in evaluation_db with ignoring -1 values
+    # return: a list of objects where each object represents a joint analysis
+
+    # this object contains:
+    #   - name: the name of the joint
+    #   - x_axis: the x axis (reps)
+    #   - y_axis: the y axis (cumulative sum ignoring -1)
+    #   - weights: the weights of the line
+    #   - line: the line equation
+    #   - slope: the slope of the line
+    #   - reps: the number of reps
+    #   - available: a boolean value that indicates if the joint has data or not
     def analyze(self, converted_evaluation: pd.DataFrame) -> List[Dict[str, Any]]:
 
         # all_involved_joints = self.get_all_involved_joints_flattened(
@@ -115,13 +141,17 @@ class PostProcessor:
         #     'slope': np.polyfit(converted_evaluation['rep'], converted_evaluation[joint.name.lower()].cumsum(), 1)[0]
         # } for joint in all_involved_joints]
 
+    # get the feedback of a joint based on the analysis done in the "analyze()" function
+    # based on the slope of the line
     def get_joint_feedback(self, joint_graph: Dict[str, Any]) -> Dict[str, Any]:
         joint_graph['feedback'] = joint_graph['slope'] <= SLOPE_THRESHOLD
         return joint_graph
 
+    # get the feedback of all joints
     def get_all_joints_feedback(self, analyzed_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         return list(map(self.get_joint_feedback, analyzed_data))
 
+    # Construct plots for each joint and save them in the graphs_path folder
     def visualize(self, analyzed_data: List[Dict], graphs_path: Optional[str]):
         for index, joint in enumerate(analyzed_data):
             plt.figure(figsize=(10, 10))
@@ -165,6 +195,7 @@ class PostProcessor:
                 plt.show()
     
     
+    # Merge evaluation.csv to evaluation_db.csv and analyze evaluation_db.csv)
     #? The only method you need to call for post processing
     @staticmethod
     def run_with_merge(directory_path: str, graphs_path: str) -> List[Dict[str, Any]]:
@@ -197,6 +228,7 @@ class PostProcessor:
         post_processor.visualize(analyzed_data, graphs_path=graphs_path)
         return post_processor.get_all_joints_feedback(analyzed_data)
     
+    # Analyze the evaluation_db.csv file
     #? The only method you need to call for analysis page
     @staticmethod
     def run_without_merge(directory_path: str, graphs_path: str) -> Optional[List[Dict[str, Any]]]:
