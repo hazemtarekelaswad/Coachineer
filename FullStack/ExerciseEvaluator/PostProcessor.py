@@ -186,12 +186,9 @@ class PostProcessor:
 
         # TODO: Get stored evaluation from database not a file
         stored_evaluation = post_processor.read_csv_file(evaluation_db_path)
-        print (stored_evaluation)
-        print(converted_evaluation)
 
         # Merge stored evaluation with converted_evaluation
         merged_evaluation = post_processor.merge(stored_evaluation, converted_evaluation)
-        print(merged_evaluation)
 
         # TODO: Save converted_evaluation to database not a file
         merged_evaluation.to_csv(evaluation_db_path, index=False)
