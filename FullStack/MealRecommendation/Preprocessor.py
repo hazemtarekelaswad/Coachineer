@@ -1,4 +1,5 @@
 
+import os
 import pickle
 import numpy as np
 from Common.Definitions import *
@@ -57,6 +58,10 @@ class Preprocessor:
             pickle.dump(feature_matrix.columns, f)
 
     def preprocess_interactions(self, pp_meals, read_files: bool = True) -> pd.DataFrame:
+
+        if read_files and not os.path.exists(PROCESSED_INTERACTIONS_PATH):
+            read_files = False
+
         if read_files:
             pp_interactions = pd.read_csv(PROCESSED_INTERACTIONS_PATH)
             return pp_interactions
@@ -72,6 +77,14 @@ class Preprocessor:
 
     def preprocess_meals(self, read_files: bool = True) -> Tuple[pd.DataFrame, pd.DataFrame]:
         # read preprocessed (meals, interactions, feature matrix) files if they exist
+        # check for files existence
+        
+        if read_files and \
+            (not os.path.exists(PROCESSED_MEALS_PATH) \
+             or not os.path.exists(FEATURE_MATRIX_SPARSE_PATH) \
+            or not os.path.exists(FEATURE_MATRIX_COLUMNS_PATH)):
+            read_files = False
+            
         if read_files:
             pp_meals = pd.read_csv(PROCESSED_MEALS_PATH)
             feature_matrix = self._read_feature_matrix()
