@@ -20,6 +20,9 @@ class User:
         activity_level: ActivityLevel,
         diet_type: DietType,
         allergies: List[Allergy],
+
+        # should contain 'recipe_id' and 'rating' columns
+        interactions: pd.DataFrame = pd.DataFrame(columns=['recipe_id', 'rating'])
     ):
         self.uid = uid
         self.first_name = first_name
@@ -37,6 +40,8 @@ class User:
         #!
         self.diet_type = diet_type
         self.allergies = allergies
+
+        self.interactions = interactions # recipe_id, rating
         
     def get_bmi(self) -> float:
         return Health.calculate_bmi(self.weight, self.height)
@@ -63,12 +68,4 @@ class User:
     #! Should take other parameters to calculate that score
     def _calculate_score(self, meal: pd.Series, rating: int) -> float:
         pass
-    
-    # Calculate the similarity between the user vecotor and the meal vector
-    def calculate_similariy(self, meal: pd.Series) -> float:
-        pass
-    
-    #! Should return an array of ingredients and a number for each
-    #! ingredient that represents his preference for it 
-    def calculate_user_vector(self) -> np.ndarray:
-        pass
+ 
