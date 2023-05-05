@@ -31,6 +31,8 @@ def signup():
     return render_template('./auth/signup.html')
 
 
+
+
 @app.route('/signin', methods=['GET', 'POST'])
 def signin():
     form = loginForm()
@@ -45,6 +47,40 @@ def signin():
             flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('./auth/login.html', form=form)
 
+def init_meal_service():
+    
+    path = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        Config.MEAL_RECOMMENDER_FOLDER
+    )
+
+    
+    recommender_service = mr.MealRecommenderService()
+
+    ##################### SHOULD BE IN SIGNUP (FROM DB) #####################
+    
+    dummy_user = mr.User(
+        uid = 94,
+        first_name='John',
+        last_name='Doe',
+        email='john@gmai.com',
+        password='password',
+        gender=mr.Gender.MALE,
+        age=20,
+        weight=170,
+        height=70,
+        goal=mr.Goal.BUILD_MUSCLE,
+        activity_level=mr.ActivityLevel.SEDENTARY,
+        diet_type=mr.DietType.KETO,
+        allergies=[mr.Allergy.GLUTEN],
+    )
+    recommender_service.init_user(dummy_user)
+    recommender_service.preprocess(path)
+    recommender_service.fill_user_interactions(recommender_service.pp_interactions)
+
+    app.meal_recommender = recommender_service
+
+    ######################################################
 
 @app.route('/signout')
 def signout():
@@ -251,11 +287,11 @@ def meals():
         Config.MEAL_RECOMMENDER_FOLDER
     )
 
-
     
     recommender_service = mr.MealRecommenderService()
 
     ##################### SHOULD BE IN SIGNUP (FROM DB) #####################
+
     dummy_user = mr.User(
         uid = 94,
         first_name='John',
@@ -276,7 +312,7 @@ def meals():
     # recommender_service.fill_user_interactions(recommender_service.pp_interactions)
 
     ######################################################
-
+    recommended_meals = app.meal_recommender.recommend_meals(path, 3)
     # recommended_meals = recommender_service.recommend_meals(path, 3)
 
     # dummy recommended meals
