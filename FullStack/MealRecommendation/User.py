@@ -1,6 +1,6 @@
-from Common.Definitions import *
-from Common.Imports import *
-from Health import Health
+from .Common.Definitions import *
+from .Common.Imports import *
+from .Health import Health
 
 
 class User:
@@ -22,7 +22,7 @@ class User:
         allergies: List[Allergy],
 
         # should contain 'recipe_id' and 'rating' columns
-        interactions: pd.DataFrame = pd.DataFrame(columns=['recipe_id', 'rating'])
+        # interactions: pd.DataFrame = pd.DataFrame(columns=['recipe_id', 'rating'])
     ):
         self.uid = uid
         self.first_name = first_name
@@ -41,7 +41,7 @@ class User:
         self.diet_type = diet_type
         self.allergies = allergies
 
-        self.interactions = interactions # recipe_id, rating
+        self.interactions = None # recipe_id, rating
         
     def get_bmi(self) -> float:
         return Health.calculate_bmi(self.weight, self.height)
@@ -61,7 +61,7 @@ class User:
         )
     
     def get_macros(self) -> Tuple[float, float, float]:
-        return Health.calculate_macro_calories(self.get_daily_calories())
+        return Health.calculate_macro_grams(self.get_daily_calories())
 
     ########################################
 

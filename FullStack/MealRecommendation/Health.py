@@ -1,5 +1,5 @@
-from Common.Imports import *
-from Common.Definitions import *
+from .Common.Imports import *
+from .Common.Definitions import *
 
 # Contains utility functions to calculate nutritional values and health metrics
 ## NOTE
@@ -36,12 +36,15 @@ class Health:
             raise ValueError("Invalid activity level")
         
         if goal == Goal.LOSE_WEIGHT:
-            return basic_calories - 500 # from 500 to 1000
-        if goal == Goal.MAINTAIN_WEIGHT:
-            return basic_calories
-        if goal == Goal.BUILD_MUSCLE:
-            return basic_calories + 500 # from 250 to 500
-        raise ValueError("Invalid goal")
+            basic_calories -= 500 # from 500 to 1000
+        elif goal == Goal.MAINTAIN_WEIGHT:
+            basic_calories = basic_calories
+        elif goal == Goal.BUILD_MUSCLE:
+            basic_calories += 500 # from 250 to 500
+        else:
+            raise ValueError("Invalid goal")
+        
+        return round(basic_calories)
     
     # Returns body fat percentage and body fat category
     @staticmethod
@@ -87,4 +90,4 @@ class Health:
     # Returns carbs, protein, fat in grams
     @staticmethod
     def calculate_macro_grams(calories: float) -> Tuple[float, float, float]:
-        return calories * 0.5 / 4, calories * 0.3 / 4, calories * 0.2 / 9
+        return round(calories * 0.5 / 4, 2), round(calories * 0.3 / 4, 2), round(calories * 0.2 / 9, 2)

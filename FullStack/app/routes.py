@@ -4,6 +4,7 @@ import sys
 import cv2
 from flask import render_template, url_for, flash, redirect, request, jsonify, Response
 from flask_login import login_user, current_user, logout_user, login_required
+import pandas as pd
 from app import app, db, bcrypt, utils
 from app.forms import UploadVideoForm, loginForm
 from app.models import User
@@ -13,6 +14,7 @@ from app.camera import VideoCamera
 # from app.models import
 
 import ExerciseEvaluator
+import MealRecommendation as mr
 
 # Home Route
 
@@ -54,30 +56,6 @@ def signout():
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    pass
-
-# Meal Routes
-
-
-@app.route('/meals')
-def meals():
-    pass
-
-
-@app.route('/meals/<int:meal_id>', methods=['GET', 'POST'])
-def meal(meal_id):
-    pass
-
-
-@app.route('/recommended-meals')
-@login_required
-def recommended_meals():
-    pass
-
-
-@app.route('/recommended-meals/<int:meal_id>', methods=['GET', 'POST'])
-@login_required
-def recommended_meal(meal_id):
     pass
 
 ######################### Exercise Routes #########################
@@ -234,33 +212,6 @@ def video():
 def realtime_video(exercise_id):
     pass
 
-# camera = cv2.VideoCapture(0)
-# def generate_frames(path):
-#     writer = cv2.VideoWriter(path, -1, 20.0, (camera.get(3), camera.get(4)))
-
-#     while True:
-#         success, frame = camera.read()
-#         frame = cv2.flip(frame, 1)
-#         if not success or stop:
-#             break
-
-#         if start:
-#             writer.write(frame)
-#         _, buffer = cv2.imencode('.jpg', frame)
-#         frame = buffer.tobytes()
-
-#         yield(b'--frame\r\n' b'Content-Type: image/jpg\r\n\r\n' + frame + b'\r\n')
-#     writer.release()
-
-# @app.route('/video')
-# def video():
-#     path = os.path.join(
-#             os.path.abspath(os.path.dirname(__file__)),
-#             Config.UPLOAD_FOLDER,
-#             secure_filename(video.filename)
-#         )
-#     return Response(generate_frames(path), mimetype='multipart/x-mixed-replace; boundary=frame')
-
 #! should be called after the video evaluation is done
 @app.route('/postprocessing')
 def postprocess():
@@ -289,3 +240,74 @@ def analyze_evaluated_exercise():
     feedback = ExerciseEvaluator.PostProcessor.run_without_merge(path, graphs_path)
     if feedback is None: return render_template('empty_analysis.html')
     return render_template('analysis.html', graphs=utils.joints, feedback=feedback)
+
+######################### Meal Routes #########################
+
+@app.route('/meals')
+def meals():
+
+    path = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        Config.MEAL_RECOMMENDER_FOLDER
+    )
+
+
+    
+    recommender_service = mr.MealRecommenderService()
+
+    ##################### SHOULD BE IN SIGNUP (FROM DB) #####################
+    dummy_user = mr.User(
+        uid = 94,
+        first_name='John',
+        last_name='Doe',
+        email='john@gmai.com',
+        password='password',
+        gender=mr.Gender.MALE,
+        age=20,
+        weight=170,
+        height=70,
+        goal=mr.Goal.BUILD_MUSCLE,
+        activity_level=mr.ActivityLevel.SEDENTARY,
+        diet_type=mr.DietType.KETO,
+        allergies=[mr.Allergy.GLUTEN],
+    )
+    recommender_service.init_user(dummy_user)
+    # recommender_service.preprocess(path)
+    # recommender_service.fill_user_interactions(recommender_service.pp_interactions)
+
+    ######################################################
+
+    # recommended_meals = recommender_service.recommend_meals(path, 3)
+
+    # dummy recommended meals
+    recommended_meals = pd.DataFrame(
+        columns=['id', 'calorie_level', 'replaced_ingredients', 'name', 'minutes', 'nutrition', 'steps', 'ingredients'],
+        data={
+            'id': [72621, 4325, 52300],
+            'calorie_level': [25498, 472459, 203360],
+            'replaced_ingredients': [1, 2, 1],
+            'name': ['raspberry coconut and blueberry sundae', 'creamy cajun chicken pasta with bacon', 'barefoot contessa s rosemary polenta'],
+            'minutes': [40, 40, 40],
+            'nutrition': [[326.6, 13.0, 222.0, 3.0, 7.0, 26.0, 20.0], [1123.2, 89.0, 30.0, 23.0, 92.0, 157.0, 34.0], [300.8, 32.0, 4.0, 11.0, 14.0, 51.0, 7.0]],
+            'steps': ['coconut sauce: in heavy saucepan , combine s...', 'place chicken , olive oil and cajun seasonin...', 'heat the butter and olive oil in a large sau...'],
+            'ingredients': [['vanilla ice cream', 'fresh blueberries', 'fresh raspberries', 'coconut sauce', 'toasted coconut', 'toasted almonds'], ['cajun seasoning', 'extra virgin olive oil', 'chicken breasts', 'bacon', 'penne pasta', 'heavy cream', 'parmesan cheese'], ['unsalted butter', 'olive oil', 'garlic', 'crushed red pepper flakes', 'chicken stock', 'cornmeal', 'kosher salt', 'fresh ground black pepper', 'fresh rosemary', 'parmesan cheese']]
+        }
+    )
+
+    return render_template('meals.html', meals=recommended_meals, user=dummy_user)
+
+@app.route('/meals/<int:meal_id>', methods=['GET', 'POST'])
+def meal(meal_id):
+    pass
+
+
+@app.route('/recommended-meals')
+@login_required
+def recommended_meals():
+    pass
+
+
+@app.route('/recommended-meals/<int:meal_id>', methods=['GET', 'POST'])
+@login_required
+def recommended_meal(meal_id):
+    pass

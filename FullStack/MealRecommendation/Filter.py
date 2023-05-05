@@ -1,7 +1,7 @@
-from User import User
+from .User import User
 import pandas as pd
-from Common.Imports import *
-from Common.Definitions import *
+from .Common.Imports import *
+from .Common.Definitions import *
 from typing import Dict
 
 

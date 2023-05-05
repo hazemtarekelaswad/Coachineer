@@ -8,4 +8,5 @@ class Config:
     PROCESSED_FOLDER = 'static/videos/processed'
     ANALYSIS_FOLDER = 'static/analysis'
     GRAPHS_FOLDER = 'static/images/graphs'
+    MEAL_RECOMMENDER_FOLDER = 'static/meal_recommender'
     DEFAULT_VIDEO_NAME = 'video.mp4'

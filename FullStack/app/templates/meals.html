@@ -1,0 +1,74 @@
+{% extends 'master.html' %}
+{% block title %}{{ "Meals recommendation system" }}{% endblock title %}
+
+{% block headings %}
+<style>
+	.nutrients-section {
+		background-color: rgb(255,252,242);
+	}
+  .meals-section {
+    background-color: #5F5E5A;
+  }
+</style>
+{% endblock headings %}
+
+
+
+{% block content %}
+<div class="container my-4">
+  <h1>Meal Planner</h1>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-8 meals-section p-3">
+      <!-- Recommended meals -->
+      <h2 class="text-white">Recommended meals</h2>
+      {% for _, row in meals.iterrows() %}
+        <div class="card my-3">
+          <div class="card-body">
+            <h5 class="card-title text-dark">{{ row['name'] }}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">{{ row['nutrition'][0] }} Calories</h6>
+            <p class="card-text text-dark">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <a href="#" class="card-link">Card link</a>
+            <a href="#" class="card-link">Another link</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="col-4 p-3 nutrients-section border">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Current nutrients</th>
+            <th scope="col">Target nutrients</th>
+          </tr>
+        </thead>
+        <tbody class="table-group-divider">
+          <tr>
+            <th>Calories</th>
+            <td>565</td>
+            <td>{{ user.get_daily_calories() }}</td>
+          </tr>
+          <tr>
+            <th>Carbs (g)</th>
+            <td>185.5</td>
+            <td>{{ user.get_macros()[0] }}</td>
+          </tr>
+          <tr>
+            <th>Fat (g)</th>
+            <td>120.9</td>
+            <td>{{ user.get_macros()[2] }}</td>
+          </tr>
+          <tr>
+            <th>Protein (g)</th>
+            <td>183</td>
+            <td>{{ user.get_macros()[1] }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+{% endblock content %}

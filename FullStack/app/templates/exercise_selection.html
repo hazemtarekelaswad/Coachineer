@@ -21,9 +21,9 @@ Exercises
 	<p class="fs-2">Choose an exercise:</p>
 </div>
 <div class="container text-center">
-	<div class="row">
+	<div class="row row-cols-2">
 		{% for exercise in exercises %}
-		<div class="col-4 my-3">
+		<div class="my-3">
 			<div class="card text-left">
 				<img class="card-img-top"
 					src="{{ url_for('static', filename = 'images/exercises/' + exercise.image) }}" />

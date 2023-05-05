@@ -1,18 +1,20 @@
+import os
 import pickle
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import explained_variance_score, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
-from User import User
-from Common.Imports import *
+from .User import User
+from .Common.Imports import *
 from scipy.sparse import csr_matrix
 
 MODELS_PATH = 'Models'
 
 class Recommender:
-    def __init__(self, meals: pd.DataFrame, feature_matrix: pd.DataFrame, user: User):
+    def __init__(self, meals: pd.DataFrame, feature_matrix: pd.DataFrame, user: User, path: str):
         self.meals = meals
         self.feature_matrix = feature_matrix
         self.user = user
+        self.path = path
     
     # returns rated meals
     def _get_rated_meals(self) -> List[np.ndarray]:
@@ -113,10 +115,10 @@ class Recommender:
         print('Accuracy: ', accuracy)
 
         # save model as pickle file
-        pickle.dump(model, open(f'{MODELS_PATH}/{self.user.uid}_content_based_model.pkl', 'wb'))
+        pickle.dump(model, open(os.path.join(self.path, f'{MODELS_PATH}/{self.user.uid}_content_based_model.pkl'), 'wb'))
         
     def recommend(self, unrated_meals: pd.DataFrame, unrated_meals_ids: List[int], meals_count: int) -> pd.DataFrame:
-        model = pickle.load(open(f'{MODELS_PATH}/{self.user.uid}_content_based_model.pkl', 'rb'))
+        model = pickle.load(open(os.path.join(self.path, f'{MODELS_PATH}/{self.user.uid}_content_based_model.pkl'), 'rb'))
         x_test = unrated_meals
         y_pred_test = model.predict(x_test)
         

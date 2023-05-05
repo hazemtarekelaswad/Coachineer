@@ -8,29 +8,22 @@ exercises = [
         "image": "biceps_curls.jpg",
     },
     {
-        "id": 1,
+        "id": ExerciseEvaluator.ExerciseType.SQUATS.value,
+        "type": ExerciseEvaluator.ExerciseType.SQUATS,
         "name": "Squats",
         "image": "squats.jpg",
     },
     {
-        "id": 2,
-        "name": "Push Ups",
-        "image": "pushups.jpg",
+        "id": ExerciseEvaluator.ExerciseType.LEG_RAISES.value,
+        "type": ExerciseEvaluator.ExerciseType.LEG_RAISES,
+        "name": "Leg Raises",
+        "image": "leg_raises.png",
     },
     {
-        "id": 3,
+        "id": ExerciseEvaluator.ExerciseType.LATERAL_RAISES.value,
+        "type": ExerciseEvaluator.ExerciseType.LATERAL_RAISES,
         "name": "Lateral Raises",
-        "image": "biceps_curls.jpg",
-    },
-    {
-        "id": 4,
-        "name": "Pull ups",
-        "image": "biceps_curls.jpg",
-    },
-    {
-        "id": 5,
-        "name": "Triceps Extensions",
-        "image": "biceps_curls.jpg",
+        "image": "lateral_raises.jpg",
     }
 ]
 

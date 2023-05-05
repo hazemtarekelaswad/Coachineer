@@ -4,6 +4,9 @@ from ..Common.Imports import *
 
 class ExerciseType(Enum):
     BICEPS_CURLS = 0
+    SQUATS = 1
+    LEG_RAISES = 2
+    LATERAL_RAISES = 3
 
 # Better naming for joints
 class JointType(Enum):
