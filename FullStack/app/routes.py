@@ -312,11 +312,12 @@ def meals():
     # recommender_service.fill_user_interactions(recommender_service.pp_interactions)
 
     ######################################################
-    recommended_meals = app.meal_recommender.recommend_meals(path, 3)
+    # recommended_meals = app.meal_recommender.recommend_meals(path, 3)
     # recommended_meals = recommender_service.recommend_meals(path, 3)
 
     # dummy recommended meals
     recommended_meals = pd.DataFrame(
+        index=[5, 898, 2132],
         columns=['id', 'calorie_level', 'replaced_ingredients', 'name', 'minutes', 'nutrition', 'steps', 'ingredients'],
         data={
             'id': [72621, 4325, 52300],
@@ -325,12 +326,27 @@ def meals():
             'name': ['raspberry coconut and blueberry sundae', 'creamy cajun chicken pasta with bacon', 'barefoot contessa s rosemary polenta'],
             'minutes': [40, 40, 40],
             'nutrition': [[326.6, 13.0, 222.0, 3.0, 7.0, 26.0, 20.0], [1123.2, 89.0, 30.0, 23.0, 92.0, 157.0, 34.0], [300.8, 32.0, 4.0, 11.0, 14.0, 51.0, 7.0]],
-            'steps': ['coconut sauce: in heavy saucepan , combine s...', 'place chicken , olive oil and cajun seasonin...', 'heat the butter and olive oil in a large sau...'],
+            'steps': [['vanilla ice cream', 'fresh blueberries', 'fresh raspberries', 'coconut sauce', 'toasted coconut', 'toasted almonds'], ['cajun seasoning', 'extra virgin olive oil', 'chicken breasts', 'bacon', 'penne pasta', 'heavy cream', 'parmesan cheese'], ['unsalted butter', 'olive oil', 'garlic', 'crushed red pepper flakes', 'chicken stock', 'cornmeal', 'kosher salt', 'fresh ground black pepper', 'fresh rosemary', 'parmesan cheese']],
             'ingredients': [['vanilla ice cream', 'fresh blueberries', 'fresh raspberries', 'coconut sauce', 'toasted coconut', 'toasted almonds'], ['cajun seasoning', 'extra virgin olive oil', 'chicken breasts', 'bacon', 'penne pasta', 'heavy cream', 'parmesan cheese'], ['unsalted butter', 'olive oil', 'garlic', 'crushed red pepper flakes', 'chicken stock', 'cornmeal', 'kosher salt', 'fresh ground black pepper', 'fresh rosemary', 'parmesan cheese']]
         }
     )
 
     return render_template('meals.html', meals=recommended_meals, user=dummy_user)
+
+# Now you have the meal index, and the rating value
+@app.route('/meals/submit-rating', methods=['POST'])
+def submit_rating():
+    meal_index = request.form.get(f'meal-index')
+    rating = request.form.get(f'rating-value-{meal_index}')
+    if rating is None or rating == '':
+        return redirect(url_for('meals'))
+    
+    print(f'rating: {rating}')
+    print(f'meal index: {meal_index}')
+    
+    # TODO: save rating and meal index to db 
+    
+    return redirect(url_for('meals'))
 
 @app.route('/meals/<int:meal_id>', methods=['GET', 'POST'])
 def meal(meal_id):

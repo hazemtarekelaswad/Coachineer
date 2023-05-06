@@ -126,4 +126,5 @@ class Recommender:
         unrated_lst = list(zip(y_pred_test, unrated_meals_ids))
         unrated_lst.sort(key=lambda x: x[0], reverse=True)
         top_K_recommendations = self.meals.iloc[[x[1] for x in unrated_lst[:meals_count]]]
+        top_K_recommendations = top_K_recommendations.drop('id', axis=1)
         return top_K_recommendations

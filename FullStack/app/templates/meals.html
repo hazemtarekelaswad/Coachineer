@@ -4,10 +4,23 @@
 {% block headings %}
 <style>
 	.nutrients-section {
-		background-color: rgb(255,252,242);
+		background-color: #f6faff
 	}
+ 
   .meals-section {
-    background-color: #5F5E5A;
+    background-color: #e4e8ed
+  }
+
+  .meal {
+		transition: 0.2s opacity;
+  }
+
+  .meal:hover {
+    opacity: 85%;
+  }
+
+  .star-label i {
+    font-size: 2em;
   }
 </style>
 {% endblock headings %}
@@ -15,24 +28,134 @@
 
 
 {% block content %}
+
+
 <div class="container my-4">
   <h1>Meal Planner</h1>
 </div>
 <div class="container">
   <div class="row">
-    <div class="col-8 meals-section p-3">
+    <div class="col-8 meals-section py-5 px-5 border">
       <!-- Recommended meals -->
-      <h2 class="text-white">Recommended meals</h2>
-      {% for _, row in meals.iterrows() %}
-        <div class="card my-3">
-          <div class="card-body">
-            <h5 class="card-title text-dark">{{ row['name'] }}</h5>
-            <h6 class="card-subtitle mb-2 text-body-secondary">{{ row['nutrition'][0] }} Calories</h6>
-            <p class="card-text text-dark">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="card-link">Card link</a>
-            <a href="#" class="card-link">Another link</a>
+      <h2>Recommended meals</h2>
+      {% for index, row in meals.iterrows() %}
+        <div class="meal card my-3 text-bg-dark">
+          <div class="card-body" style="position: relative;">
+            <h1>{{ loop.index }}</h1>
+            <p class="fs-6 fst-italic mb-2 text-secondary-emphasis">ID: {{ index }}</p>
+            <h5 class="card-title text-white">{{ row['name'] }}</h5>
+            <h6 class="card-subtitle mb-2 text-body-white">{{ row['nutrition'][0] }} Calories</h6>
+            <a href="#" class="stretched-link"  style="text-decoration: none" data-bs-target="#mealsDetails_{{index}}" data-bs-toggle="modal"></a>
+          </div>
+          <div class="card-footer border-white d-flex flex-row justify-content-between">
+            <button class="btn btn-light my-1" href="#"><i class="bi bi-arrow-counterclockwise"></i> Regenerate</button>
+            <button class="btn btn-light my-1 rate-button" data-index="{{index}}" href="#" data-bs-target="#rating-modal_{{index}}" data-bs-toggle="modal"><i class="bi bi-star-fill"></i> Rate</button>
           </div>
         </div>
+
+        <div class="modal fade" id="rating-modal_{{index}}" aria-hidden="true" aria-labelledby="rateModalToggleLabel" tabindex="-1">
+          <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="rateModalToggleLabel">Rate this meal!</h1>
+                <button type="button" class="btn-close" id="rating-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form action="meals/submit-rating" method="post" class="d-flex flex-column">
+                  <div class="d-flex flex-row justify-content-evenly">
+                    <input type="radio" id="star1-{{index}}" name="rating-{{index}}" value="1" class="d-none">
+                    <label for="star1-{{index}}" title="1 star" class="star-label"><i class="bi-sm bi-star"></i></label>
+                    <input type="radio" id="star2-{{index}}" name="rating-{{index}}" value="2" class="d-none">
+                    <label for="star2-{{index}}" title="2 stars" class="star-label"><i class="bi bi-star"></i></label>
+                    <input type="radio" id="star3-{{index}}" name="rating-{{index}}" value="3" class="d-none">
+                    <label for="star3-{{index}}" title="3 stars" class="star-label"><i class="bi bi-star"></i></label>
+                    <input type="radio" id="star4-{{index}}" name="rating-{{index}}" value="4" class="d-none">
+                    <label for="star4-{{index}}" title="4 stars" class="star-label"><i class="bi bi-star"></i></label>
+                    <input type="radio" id="star5-{{index}}" name="rating-{{index}}" value="5" class="d-none">
+                    <label for="star5-{{index}}" title="5 stars" class="star-label"><i class="bi bi-star"></i></label>
+                  </div>
+                  <input type="hidden" id="rating-value-{{index}}" name="rating-value-{{index}}">
+                  <input type="hidden" class="meal-index" name="meal-index" value="{{ index }}">
+                  <button type="submit" class="btn btn-primary mt-3">Rate</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        
+        <div class="modal fade" id="mealsDetails_{{index}}" aria-hidden="true" aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+          <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalToggleLabel">{{ row['name'] }}</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                
+                <div class="container my-3">
+                  <p class="fst-italic">It takes <strong>{{ row['minutes'] }}</strong> mins to prep and cook</p>
+                </div>
+
+                <div class="container my-3">
+                  <h5>Nutrition</h5>
+                  <table class="table table-light border">
+                    <tbody class="table-group">
+                      <tr>
+                        <td>Calories</td>
+                        <td>{{ row['nutrition'][0] }}</td>
+                      </tr>
+                      <tr>
+                        <td>Fat (PDV)</td>
+                        <td>{{ row['nutrition'][1] }}</td>
+                      </tr>
+                      <tr>
+                        <td>Sugar (PDV)</td>
+                        <td>{{ row['nutrition'][2] }}</td>
+                      </tr>
+                      <tr>
+                        <td>Sodium (PDV)</td>
+                        <td>{{ row['nutrition'][3] }}</td>
+                      </tr>
+                      <tr>
+                        <td>Protein (PDV)</td>
+                        <td>{{ row['nutrition'][4] }}</td>
+                      </tr>
+                      <tr>
+                        <td>Saturated Fat (PDV)</td>
+                        <td>{{ row['nutrition'][5] }}</td>
+                      </tr>
+                      <tr>
+                        <td>Carbs (PDV)</td>
+                        <td>{{ row['nutrition'][6] }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+            
+                </div>
+
+                <div class="container my-3">
+                  <h5>Ingredients</h5>
+                  <ul class="list-group">
+                    {% for ingredient in row['ingredients'] %}
+                      <li class="list-group-item list-group-item-primary">{{ ingredient }}</li>
+                    {% endfor %}
+                  </ul>
+                </div>
+
+                <div class="container my-3">
+                  <h5>Steps</h5>
+                  <ol class="list-group list-group-numbered">
+                    {% for step in row['steps'] %}
+                      <li class="list-group-item list-group-item-dark">{{ step }}</li>
+                    {% endfor %}
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       {% endfor %}
     </div>
     <div class="col-4 p-3 nutrients-section border">
@@ -40,29 +163,29 @@
         <thead>
           <tr>
             <th scope="col"></th>
-            <th scope="col">Current nutrients</th>
+            <!-- <th scope="col">Current nutrients</th> -->
             <th scope="col">Target nutrients</th>
           </tr>
         </thead>
         <tbody class="table-group-divider">
           <tr>
             <th>Calories</th>
-            <td>565</td>
+            <!-- <td>565</td> -->
             <td>{{ user.get_daily_calories() }}</td>
           </tr>
           <tr>
             <th>Carbs (g)</th>
-            <td>185.5</td>
+            <!-- <td>185.5</td> -->
             <td>{{ user.get_macros()[0] }}</td>
           </tr>
           <tr>
             <th>Fat (g)</th>
-            <td>120.9</td>
+            <!-- <td>120.9</td> -->
             <td>{{ user.get_macros()[2] }}</td>
           </tr>
           <tr>
             <th>Protein (g)</th>
-            <td>183</td>
+            <!-- <td>183</td> -->
             <td>{{ user.get_macros()[1] }}</td>
           </tr>
         </tbody>
@@ -71,4 +194,56 @@
     </div>
   </div>
 </div>
+
+
 {% endblock content %}
+
+{% block scripts %}
+<script>
+
+  let index = undefined;
+  $(".rate-button").click(function() {
+    // Get the index of the meal
+    let idx = $(this).attr("data-index");
+    index = idx;
+  });
+
+  // Add click event listener to star labels
+  $(".star-label").click(function() {
+    // Get the clicked label and its value
+    var clickedLabel = $(this);
+    var value = clickedLabel.prev().val();
+    
+    // Set the value of the hidden radio button
+    clickedLabel.prev().prop("checked", true);
+    
+    // Update the CSS of the stars
+    $(".star-label i").removeClass("bi-star-fill").addClass("bi-star");
+    clickedLabel.prevAll().addBack().children("i").removeClass("bi-star").addClass("bi-star-fill");
+    
+
+
+    // Print the selected value to the console
+    $(`#rating-value-${index}`).val(value);
+    $(`.meal-index`).val(index);
+    console.log("Selected value: " + value);
+  });
+  
+  $("#rating-close-btn").click(function() {
+    // Reset the rating value
+    $(`#rating-value-${index}`).val("");
+    $(`.meal-index`).val("");
+
+
+    
+    // Reset the CSS of the stars
+    $(".star-label i").removeClass("bi-star-fill").addClass("bi-star");
+    
+    // Reset the radio buttons
+    $(`input[name='rating-${index}']`).prop("checked", false);
+
+  });
+
+
+</script>
+{% endblock scripts %}
