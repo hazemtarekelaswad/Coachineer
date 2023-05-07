@@ -308,30 +308,59 @@ def meals():
         allergies=[mr.Allergy.GLUTEN],
     )
     recommender_service.init_user(dummy_user)
-    # recommender_service.preprocess(path)
-    # recommender_service.fill_user_interactions(recommender_service.pp_interactions)
+    recommender_service.preprocess(path)
+    recommender_service.fill_user_interactions(recommender_service.pp_interactions)
 
     ######################################################
     # recommended_meals = app.meal_recommender.recommend_meals(path, 3)
     # recommended_meals = recommender_service.recommend_meals(path, 3)
 
     # dummy recommended meals
-    recommended_meals = pd.DataFrame(
-        index=[5, 898, 2132],
-        columns=['id', 'calorie_level', 'replaced_ingredients', 'name', 'minutes', 'nutrition', 'steps', 'ingredients'],
-        data={
-            'id': [72621, 4325, 52300],
-            'calorie_level': [25498, 472459, 203360],
-            'replaced_ingredients': [1, 2, 1],
-            'name': ['raspberry coconut and blueberry sundae', 'creamy cajun chicken pasta with bacon', 'barefoot contessa s rosemary polenta'],
-            'minutes': [40, 40, 40],
-            'nutrition': [[326.6, 13.0, 222.0, 3.0, 7.0, 26.0, 20.0], [1123.2, 89.0, 30.0, 23.0, 92.0, 157.0, 34.0], [300.8, 32.0, 4.0, 11.0, 14.0, 51.0, 7.0]],
-            'steps': [['vanilla ice cream', 'fresh blueberries', 'fresh raspberries', 'coconut sauce', 'toasted coconut', 'toasted almonds'], ['cajun seasoning', 'extra virgin olive oil', 'chicken breasts', 'bacon', 'penne pasta', 'heavy cream', 'parmesan cheese'], ['unsalted butter', 'olive oil', 'garlic', 'crushed red pepper flakes', 'chicken stock', 'cornmeal', 'kosher salt', 'fresh ground black pepper', 'fresh rosemary', 'parmesan cheese']],
-            'ingredients': [['vanilla ice cream', 'fresh blueberries', 'fresh raspberries', 'coconut sauce', 'toasted coconut', 'toasted almonds'], ['cajun seasoning', 'extra virgin olive oil', 'chicken breasts', 'bacon', 'penne pasta', 'heavy cream', 'parmesan cheese'], ['unsalted butter', 'olive oil', 'garlic', 'crushed red pepper flakes', 'chicken stock', 'cornmeal', 'kosher salt', 'fresh ground black pepper', 'fresh rosemary', 'parmesan cheese']]
-        }
-    )
+    # check existence of recommended meals in app
+    if not hasattr(app, 'recommended_meals'):
+        app.recommended_meals = recommender_service.recommend_meals(path, 10)
+        app.meal_pointer = 2
+        app.recommended_meals_indexes = [0, 1, 2]
+        # app.recommended_meals = pd.DataFrame(
+        #     index=[5, 898, 2132],
+        #     columns=['id', 'calorie_level', 'replaced_ingredients', 'name', 'minutes', 'nutrition', 'steps', 'ingredients'],
+        #     data={
+        #         'id': [72621, 4325, 52300],
+        #         'calorie_level': [25498, 472459, 203360],
+        #         'replaced_ingredients': [1, 2, 1],
+        #         'name': ['raspberry coconut and blueberry sundae', 'creamy cajun chicken pasta with bacon', 'barefoot contessa s rosemary polenta'],
+        #         'minutes': [40, 40, 40],
+        #         'nutrition': [[326.6, 13.0, 222.0, 3.0, 7.0, 26.0, 20.0], [1123.2, 89.0, 30.0, 23.0, 92.0, 157.0, 34.0], [300.8, 32.0, 4.0, 11.0, 14.0, 51.0, 7.0]],
+        #         'steps': [['vanilla ice cream', 'fresh blueberries', 'fresh raspberries', 'coconut sauce', 'toasted coconut', 'toasted almonds'], ['cajun seasoning', 'extra virgin olive oil', 'chicken breasts', 'bacon', 'penne pasta', 'heavy cream', 'parmesan cheese'], ['unsalted butter', 'olive oil', 'garlic', 'crushed red pepper flakes', 'chicken stock', 'cornmeal', 'kosher salt', 'fresh ground black pepper', 'fresh rosemary', 'parmesan cheese']],
+        #         'ingredients': [['vanilla ice cream', 'fresh blueberries', 'fresh raspberries', 'coconut sauce', 'toasted coconut', 'toasted almonds'], ['cajun seasoning', 'extra virgin olive oil', 'chicken breasts', 'bacon', 'penne pasta', 'heavy cream', 'parmesan cheese'], ['unsalted butter', 'olive oil', 'garlic', 'crushed red pepper flakes', 'chicken stock', 'cornmeal', 'kosher salt', 'fresh ground black pepper', 'fresh rosemary', 'parmesan cheese']]
+        #     }
+        # )
 
-    return render_template('meals.html', meals=recommended_meals, user=dummy_user)
+     
+   
+    return render_template('meals.html', meals=app.recommended_meals.iloc[app.recommended_meals_indexes], user=dummy_user)
+
+@app.route('/cached-meals')
+def cached_meals():
+
+    dummy_user = mr.User(
+        uid = 94,
+        first_name='John',
+        last_name='Doe',
+        email='john@gmai.com',
+        password='password',
+        gender=mr.Gender.MALE,
+        age=20,
+        weight=170,
+        height=70,
+        goal=mr.Goal.BUILD_MUSCLE,
+        activity_level=mr.ActivityLevel.SEDENTARY,
+        diet_type=mr.DietType.KETO,
+        allergies=[mr.Allergy.GLUTEN],
+    )
+   
+    return render_template('meals.html', meals=app.recommended_meals.iloc[app.recommended_meals_indexes], user=dummy_user)
+
 
 # Now you have the meal index, and the rating value
 @app.route('/meals/submit-rating', methods=['POST'])
@@ -339,12 +368,27 @@ def submit_rating():
     meal_index = request.form.get(f'meal-index')
     rating = request.form.get(f'rating-value-{meal_index}')
     if rating is None or rating == '':
-        return redirect(url_for('meals'))
+        return redirect(url_for('cached_meals'))
     
     print(f'rating: {rating}')
     print(f'meal index: {meal_index}')
     
-    # TODO: save rating and meal index to db 
+    # TODO: save rating and meal_index to db for the current user 
+
+    return redirect(url_for('cached_meals'))
+
+@app.route('/meals/remove', methods=['POST'])
+def remove_meal():
+    meal_index = request.form.get('meal_index')
+    index = request.form.get('index')
+    print(f'meal index: {meal_index}')
+    print(f'counter: {index}')
+    # remove meal from recommended meals
+    # app.recommended_meals = app.recommended_meals.drop(int(meal_index))
+    # app.meal_pointer += 1
+    # app.recommended_meals_indexes.remove(int(meal_index))
+    # app.recommended_meals_indexes.append(app.meal_pointer)
+
     
     return redirect(url_for('meals'))
 

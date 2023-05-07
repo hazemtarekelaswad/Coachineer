@@ -6,12 +6,19 @@ from sklearn.model_selection import train_test_split
 from .User import User
 from .Common.Imports import *
 from scipy.sparse import csr_matrix
+from ast import literal_eval
 
 MODELS_PATH = 'Models'
 
 class Recommender:
     def __init__(self, meals: pd.DataFrame, feature_matrix: pd.DataFrame, user: User, path: str):
+        meals['nutrition'] = meals['nutrition'].apply(literal_eval)
+        meals['ingredients'] = meals['ingredients'].apply(literal_eval)
+        meals['replaced_ingredients'] = meals['replaced_ingredients'].apply(literal_eval)
+        meals['steps'] = meals['steps'].apply(literal_eval)
+        
         self.meals = meals
+
         self.feature_matrix = feature_matrix
         self.user = user
         self.path = path
