@@ -79,8 +79,12 @@ class Recommender:
         rated_meals['rating'] = self.user.interactions['rating']
         return rated_meals
 
-    def get_unrated_meals_2(self) -> Tuple[pd.DataFrame, List[int]]:
+    # quantity_ratio: 0.5 means that we want to get 50% of unrated meals
+    def get_unrated_meals_2(self, quantity_ratio: float = 1.0) -> Tuple[pd.DataFrame, List[int]]:
         unrated_meals = self.feature_matrix.iloc[~self.feature_matrix.index.isin(self.user.interactions['recipe_id'])]
+        print(f'BEFORE: {unrated_meals.shape}')
+        unrated_meals = unrated_meals.iloc[:int(unrated_meals.shape[0] * quantity_ratio)]
+        print(f'AFTER: {unrated_meals.shape}')
         unrated_meals_ids = unrated_meals.index
         return unrated_meals, unrated_meals_ids
 
@@ -135,11 +139,7 @@ class Recommender:
     def recommend(self, unrated_meals: pd.DataFrame, unrated_meals_ids: List[int], meals_count: int) -> pd.DataFrame:
         model = pickle.load(open(os.path.join(self.path, f'{MODELS_PATH}/{self.user.uid}_content_based_model.pkl'), 'rb'))
 
-        x_test = unrated_meals
-
-
-        #? 16 secs
-        y_pred_test = model.predict(x_test)
+        y_pred_test = model.predict(unrated_meals)
         
         # convert y_pred to be a tuple of y_pred and of recipe_id
         unrated_lst = list(zip(y_pred_test, unrated_meals_ids))

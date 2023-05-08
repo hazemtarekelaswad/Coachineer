@@ -67,10 +67,14 @@ class MealRecommenderService:
         if TRAIN:
             recommender.train(rated_meals, is_online=True)
 
-        unrated_meals, unrated_meals_ids = recommender.get_unrated_meals_2()
+
+        #? 1.4 secs
+        unrated_meals, unrated_meals_ids = recommender.get_unrated_meals_2(quantity_ratio=0.5)
+
+        #? 4 secs
         start_time = time.time()
         recommended_meals = recommender.recommend(unrated_meals, unrated_meals_ids, n)
-        print(f'--- {time.time() - start_time} seconds ---')
+        print(f'--- Recommend: {time.time() - start_time} seconds ---')
 
         print(f'Calories: {self.user.get_daily_calories()}')
         print(f'Carbs: {self.user.get_macros()[0]}')
