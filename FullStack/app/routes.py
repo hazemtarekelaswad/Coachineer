@@ -11,6 +11,7 @@ from app.models import User
 from app.config import Config
 from werkzeug.utils import secure_filename
 from app.camera import VideoCamera
+import time
 # from app.models import
 
 import ExerciseEvaluator
@@ -279,18 +280,14 @@ def analyze_evaluated_exercise():
 
 ######################### Meal Routes #########################
 
-@app.route('/meals')
-def meals():
-
+# TODO: should be in user's login
+@app.route('/meals/init')
+def init_meals():
     path = os.path.join(
         os.path.abspath(os.path.dirname(__file__)),
         Config.MEAL_RECOMMENDER_FOLDER
     )
-
-    
-    recommender_service = mr.MealRecommenderService()
-
-    ##################### SHOULD BE IN SIGNUP (FROM DB) #####################
+    app.recommender_service = mr.MealRecommenderService()
 
     dummy_user = mr.User(
         uid = 94,
@@ -307,20 +304,42 @@ def meals():
         diet_type=mr.DietType.KETO,
         allergies=[mr.Allergy.GLUTEN],
     )
-    recommender_service.init_user(dummy_user)
-    recommender_service.preprocess(path)
-    recommender_service.fill_user_interactions(recommender_service.pp_interactions)
+    app.recommender_service.init_user(dummy_user)
+    app.recommender_service.preprocess(path)
+    return redirect(url_for('meals'))
 
-    ######################################################
-    # recommended_meals = app.meal_recommender.recommend_meals(path, 3)
-    # recommended_meals = recommender_service.recommend_meals(path, 3)
 
-    # dummy recommended meals
-    # check existence of recommended meals in app
+@app.route('/meals')
+def meals():
+    path = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        Config.MEAL_RECOMMENDER_FOLDER
+    )
+
+    #! will be removed 
+    dummy_user = mr.User(
+        uid = 94,
+        first_name='John',
+        last_name='Doe',
+        email='john@gmai.com',
+        password='password',
+        gender=mr.Gender.MALE,
+        age=20,
+        weight=170,
+        height=70,
+        goal=mr.Goal.BUILD_MUSCLE,
+        activity_level=mr.ActivityLevel.SEDENTARY,
+        diet_type=mr.DietType.KETO,
+        allergies=[mr.Allergy.GLUTEN],
+    )
+    
+    #TODO: pp_interactions should be retrieved from db and passed to this function in the same format
+    app.recommender_service.fill_user_interactions(app.recommender_service.pp_interactions)
+
     if not hasattr(app, 'recommended_meals'):
-        app.recommended_meals = recommender_service.recommend_meals(path, 10)
+        app.recommended_meals = app.recommender_service.recommend_meals(path, 100)
         app.meal_pointer = 2
-        app.recommended_meals_indexes = [0, 1, 2]
+        app.recommended_meals_indexes = app.recommended_meals.index[0:3].tolist()
         # app.recommended_meals = pd.DataFrame(
         #     index=[5, 898, 2132],
         #     columns=['id', 'calorie_level', 'replaced_ingredients', 'name', 'minutes', 'nutrition', 'steps', 'ingredients'],
@@ -335,10 +354,8 @@ def meals():
         #         'ingredients': [['vanilla ice cream', 'fresh blueberries', 'fresh raspberries', 'coconut sauce', 'toasted coconut', 'toasted almonds'], ['cajun seasoning', 'extra virgin olive oil', 'chicken breasts', 'bacon', 'penne pasta', 'heavy cream', 'parmesan cheese'], ['unsalted butter', 'olive oil', 'garlic', 'crushed red pepper flakes', 'chicken stock', 'cornmeal', 'kosher salt', 'fresh ground black pepper', 'fresh rosemary', 'parmesan cheese']]
         #     }
         # )
-
-     
    
-    return render_template('meals.html', meals=app.recommended_meals.iloc[app.recommended_meals_indexes], user=dummy_user)
+    return render_template('meals.html', meals=app.recommended_meals.loc[app.recommended_meals_indexes], user=dummy_user)
 
 @app.route('/cached-meals')
 def cached_meals():
@@ -359,7 +376,7 @@ def cached_meals():
         allergies=[mr.Allergy.GLUTEN],
     )
    
-    return render_template('meals.html', meals=app.recommended_meals.iloc[app.recommended_meals_indexes], user=dummy_user)
+    return render_template('meals.html', meals=app.recommended_meals.loc[app.recommended_meals_indexes], user=dummy_user)
 
 
 # Now you have the meal index, and the rating value
@@ -373,37 +390,32 @@ def submit_rating():
     print(f'rating: {rating}')
     print(f'meal index: {meal_index}')
     
-    # TODO: save rating and meal_index to db for the current user 
+    # TODO: save rating and meal_index to db for the current user
+
+    # Partial fit the model with the new rating
+    path = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        Config.MEAL_RECOMMENDER_FOLDER
+    )
+    app.recommender_service.partial_fit(int(meal_index), int(rating), path)
+    
 
     return redirect(url_for('cached_meals'))
 
-@app.route('/meals/remove', methods=['POST'])
-def remove_meal():
+@app.route('/meals/regenerate', methods=['POST'])
+def regenerate_meal():
     meal_index = request.form.get('meal_index')
     index = request.form.get('index')
     print(f'meal index: {meal_index}')
     print(f'counter: {index}')
-    # remove meal from recommended meals
-    # app.recommended_meals = app.recommended_meals.drop(int(meal_index))
-    # app.meal_pointer += 1
-    # app.recommended_meals_indexes.remove(int(meal_index))
-    # app.recommended_meals_indexes.append(app.meal_pointer)
 
+    app.meal_pointer += 1
+    # replace the meal index with the new one
+    for i, meal in enumerate(app.recommended_meals_indexes):
+        if meal == int(meal_index):
+            app.recommended_meals_indexes[i] = app.recommended_meals.index[app.meal_pointer]
+            break
+
+    print(f'INDEXES: {app.recommended_meals_indexes}')
     
     return redirect(url_for('meals'))
-
-@app.route('/meals/<int:meal_id>', methods=['GET', 'POST'])
-def meal(meal_id):
-    pass
-
-
-@app.route('/recommended-meals')
-@login_required
-def recommended_meals():
-    pass
-
-
-@app.route('/recommended-meals/<int:meal_id>', methods=['GET', 'POST'])
-@login_required
-def recommended_meal(meal_id):
-    pass

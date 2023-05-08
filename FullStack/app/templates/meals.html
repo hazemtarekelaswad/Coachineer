@@ -48,7 +48,7 @@
             <a href="#" class="stretched-link"  style="text-decoration: none" data-bs-target="#mealsDetails_{{index}}" data-bs-toggle="modal"></a>
           </div>
           <div class="card-footer border-white d-flex flex-row justify-content-between">
-            <button class="btn btn-light my-1 regenerate-button" index="{{loop.index}}" meal-index="{{index}}" href="#"><i class="bi bi-arrow-counterclockwise"></i> Regenerate</button>
+            <button class="btn btn-light my-1 regenerate-button" index="{{loop.index-1}}" meal-index="{{index}}" href="#"><i class="bi bi-arrow-counterclockwise"></i> Regenerate</button>
             <button class="btn btn-light my-1 rate-button" data-index="{{index}}" href="#" data-bs-target="#rating-modal_{{index}}" data-bs-toggle="modal"><i class="bi bi-star-fill"></i> Rate</button>
           </div>
         </div>
@@ -252,7 +252,7 @@
 
     // Send a POST request to remove the item
     $.ajax({
-      url: 'meals/remove',
+      url: 'meals/regenerate',
       type: 'POST',
       data: { 
         meal_index: meal_index, 

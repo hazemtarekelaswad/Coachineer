@@ -7,6 +7,7 @@ import pandas as pd
 from typing import Dict, Optional, Tuple
 from scipy.sparse import csr_matrix
 
+import time
 
 # Preprocessed directory
 PROCESSED_DIR = 'Preprocessed'
@@ -91,7 +92,8 @@ class Preprocessor:
             feature_matrix = self._read_feature_matrix()
             return pp_meals, feature_matrix
 
-            
+        
+
         ### preprocess meals
         pp_meals = self.datasets[Dataset.MEALS][['id', 'calorie_level', 'ingredient_ids']]
         pp_meals = pp_meals.join(self.datasets[Dataset.RAW_MEALS].set_index('id'), on='id')

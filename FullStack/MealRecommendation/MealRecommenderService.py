@@ -1,4 +1,5 @@
 import os
+import pickle
 from .Common.Imports import *
 from .Common.Definitions import *
 from .Health import Health
@@ -6,12 +7,12 @@ from .Recommender import Recommender
 from .User import User
 from .Preprocessor import Preprocessor
 from .Filter import Filter
+import time
 
 # * Meal is a pandas Series, not a class
 # * all meals are in a dataframe produced from the dataset
 
 # to switch between database and csv file of interactions
-DATASET_INTERACTIONS = True
 TRAIN = False
 
 class MealRecommenderService:
@@ -38,16 +39,15 @@ class MealRecommenderService:
         preprocessor = Preprocessor(datasets, path)
         pp_meals, feature_matrix = preprocessor.preprocess_meals()
 
-        pp_interactions = None
-        user_id = None
-        if DATASET_INTERACTIONS:
-            # this is function is used only for interactions set in the dataset used for training
-            pp_interactions = preprocessor.preprocess_interactions(pp_meals)
-            # user_id = pp_interactions['user_id'].value_counts().idxmax()
-            user_id = self.user.uid
-            pp_interactions = preprocessor.get_one_user_interactions(pp_interactions, user_id)[['recipe_id', 'rating']] 
-        else: #! from database in the form of 'recipe_id', 'rating' where recipe_id is the meal index in the pp_meals dataframe
-            pass
+        #? 0.2 secs
+        # this is function is used only for interactions set in the dataset used for training
+        pp_interactions = preprocessor.preprocess_interactions(pp_meals)
+
+
+        # user_id = pp_interactions['user_id'].value_counts().idxmax()
+        user_id = self.user.uid
+        pp_interactions = preprocessor.get_one_user_interactions(pp_interactions, user_id)[['recipe_id', 'rating']] 
+
 
         self.pp_meals = pp_meals
         self.pp_interactions = pp_interactions
@@ -60,13 +60,17 @@ class MealRecommenderService:
         filtered_meals = Filter(self.pp_meals, self.user).run()
 
         recommender = Recommender(filtered_meals, self.feature_matrix, self.user, path)
+
+        #? 1.5 secs
         rated_meals = recommender.get_rated_meals_2()
 
         if TRAIN:
-            recommender.train(rated_meals)
+            recommender.train(rated_meals, is_online=True)
 
         unrated_meals, unrated_meals_ids = recommender.get_unrated_meals_2()
+        start_time = time.time()
         recommended_meals = recommender.recommend(unrated_meals, unrated_meals_ids, n)
+        print(f'--- {time.time() - start_time} seconds ---')
 
         print(f'Calories: {self.user.get_daily_calories()}')
         print(f'Carbs: {self.user.get_macros()[0]}')
@@ -74,6 +78,14 @@ class MealRecommenderService:
         print(f'Protein: {self.user.get_macros()[1]}')
         print(recommended_meals)
         return recommended_meals
+
+    def partial_fit(self, meal_index: int, rating: int, path: str):
+        model = pickle.load(open(os.path.join(path, f'Models/{self.user.uid}_content_based_model.pkl'), 'rb'))
+
+        model.partial_fit([self.feature_matrix.iloc[meal_index].values], [rating])
+
+        pickle.dump(model, open(os.path.join(path, f'Models/{self.user.uid}_content_based_model.pkl'), 'wb'))
+
 
 
 

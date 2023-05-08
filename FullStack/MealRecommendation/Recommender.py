@@ -1,6 +1,8 @@
 import os
 import pickle
+import time
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.linear_model import SGDRegressor
 from sklearn.metrics import explained_variance_score, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from .User import User
@@ -83,7 +85,7 @@ class Recommender:
         return unrated_meals, unrated_meals_ids
 
 
-    def train(self, rated_meals: pd.DataFrame):
+    def train(self, rated_meals: pd.DataFrame, is_online: bool = True):
         # split rated meals into train and test
         train, validation = train_test_split(rated_meals, train_size=0.7, test_size=0.3, random_state=42)
         # extract x_train, y_train, x_validation, y_validation by dropping recipe_id and rating columns
@@ -92,18 +94,24 @@ class Recommender:
         x_validation = validation.drop(['recipe_id', 'rating'], axis=1)
         y_validation = validation['rating']
 
-        # train linear regression model
-        model = GradientBoostingRegressor(
-            n_estimators = 4780, 
-            learning_rate = 0.01,
-            max_depth = 10, 
-            max_features = 'sqrt',
-            min_samples_leaf = 1, 
-            min_samples_split = 250, 
-            loss = 'squared_error', 
-            random_state = 6
-        )
-        model.fit(x_train, y_train)
+        if is_online:
+            model = SGDRegressor(learning_rate='constant', eta0=0.01, penalty='l1')
+            # model = PassiveAggressiveRegressor(C=0.1, epsilon=0.01, tol=0.0001)
+            for x, y in zip(x_train.values, y_train.values):
+                model.partial_fit([x], [y])
+        else:
+            # train linear regression model
+            model = GradientBoostingRegressor(
+                n_estimators = 4780, 
+                learning_rate = 0.01,
+                max_depth = 10, 
+                max_features = 'sqrt',
+                min_samples_leaf = 1, 
+                min_samples_split = 250, 
+                loss = 'squared_error', 
+                random_state = 6
+            )
+            model.fit(x_train, y_train)
 
         y_pred = model.predict(x_validation)
 
@@ -126,12 +134,17 @@ class Recommender:
         
     def recommend(self, unrated_meals: pd.DataFrame, unrated_meals_ids: List[int], meals_count: int) -> pd.DataFrame:
         model = pickle.load(open(os.path.join(self.path, f'{MODELS_PATH}/{self.user.uid}_content_based_model.pkl'), 'rb'))
+
         x_test = unrated_meals
+
+
+        #? 16 secs
         y_pred_test = model.predict(x_test)
         
         # convert y_pred to be a tuple of y_pred and of recipe_id
         unrated_lst = list(zip(y_pred_test, unrated_meals_ids))
         unrated_lst.sort(key=lambda x: x[0], reverse=True)
+
         top_K_recommendations = self.meals.iloc[[x[1] for x in unrated_lst[:meals_count]]]
         top_K_recommendations = top_K_recommendations.drop('id', axis=1)
         return top_K_recommendations
